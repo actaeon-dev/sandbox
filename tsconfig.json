@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "sourceMap": true,
+
+    "preserveConstEnums": true,
+    "removeComments": false,
+    "forceConsistentCasingInFileNames": true,
+
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    "suppressImplicitAnyIndexErrors": false,
+
+    "strict": true,
+    "alwaysStrict": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "strictNullChecks": true,
+
+    "keyofStringsOnly": true,
+    "locale": "en-us",
+
+    "lib": [ "dom", "es5" ],
+    "preserveWatchOutput": true
+  },
+
+  "files": [
+    "index.ts"
+  ],
+
+}
