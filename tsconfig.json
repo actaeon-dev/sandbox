@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "sourceMap": true,
+    "target": "es3",
+    "outDir": "dist",
+    "rootDir": "src",
+    "moduleResolution": "node",
+    "module": "es6",
+    "inlineSourceMap": true,
+    "esModuleInterop": true,
 
     "preserveConstEnums": true,
     "removeComments": false,
@@ -18,20 +23,21 @@
     "suppressImplicitAnyIndexErrors": false,
 
     "strict": true,
-    "alwaysStrict": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "strictNullChecks": true,
 
     "keyofStringsOnly": true,
     "locale": "en-us",
 
-    "lib": [ "dom", "es5" ],
-    "preserveWatchOutput": true
+    "lib": [ "dom", "es2015" ],
+    "preserveWatchOutput": true,
+
+    "traceResolution": true,
+    "listEmittedFiles": true,
+    "listFiles": true,
+    "pretty": true
   },
 
-  "files": [
-    "index.ts"
+  "include": [
+    "src/**/*.ts"
   ],
-
+  "compileOnSave": true
 }

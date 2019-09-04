@@ -1,7 +1,7 @@
 {
   "name": "English (American)",
   "id": "en-US",
-  "verified": true,
+  "complete": true,
 
   "page": {
     "scroll-to": "click to scroll to line:"
