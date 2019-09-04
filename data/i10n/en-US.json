@@ -1,0 +1,34 @@
+{
+  "name": "English (American)",
+  "id": "en-US",
+  "verified": true,
+
+  "page": {
+    "scroll-to": "click to scroll to line:"
+  },
+
+  "input_words": {
+    "a1": "take",
+    "b2": "put",
+    "c3": "open"
+  },
+
+  "output": {
+    "noun": {
+      "a1": "rock",
+      "b2": "paper",
+      "c3": "scissiors",
+    },
+    "dialogue": {
+      "a1": "Hello there.",
+      "b2": "Search me, but you'd better get them quickly.",
+      "c3": "There must be cure for it!",
+    },
+    "description": {
+      "a1": ["short", "long"]
+      "b2": ["short", "long"]
+      "c3": ["short", "long"]
+    },
+
+  }
+}

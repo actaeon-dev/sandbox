@@ -1,0 +1,52 @@
+#main {
+  /*width: 100vw;
+  height: 100vh;*/
+  text-align: center;
+}
+
+#result {
+  width: 50vw;
+  height: 10vh;
+  text-align: center;
+  margin: auto;
+
+  padding: 15px;
+
+  border: 2px solid #888;
+  border-radius: 25px;
+  box-shadow: -5px -5px #666;
+
+  overflow: auto;
+}
+
+#result-sub {
+  margin: auto;
+}
+
+.result-line {
+  font-family: monospace;
+  text-align: left;
+  margin: auto;
+}
+
+.result-line > i {
+  font-size: 12px;
+  line-height: .7;
+}
+
+.result-line-text {
+  font-size: 17px;
+  text-align: left;
+  padding-left: 16px;
+  margin: auto;
+}
+
+#stdin {
+  font-size: 17px;
+  padding: 20px;
+}
+
+#scroll-input {
+  width: 40px;
+  height: 10px;
+}

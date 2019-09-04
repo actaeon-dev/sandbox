@@ -1,25 +1,53 @@
-<!doctype html5>
+<!DOCTYPE html>
 <html>
   <head>
     <title> &gt;&gt;&gt; </title>
 
-    <meta charset="UTF-8"/>
+    <meta charset="utf-8"/>
+
+    <link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="index.css" />
 
     <script type="text/javascript" src="index.js" charset="utf-8" > </script>
 
   </head>
-  <body id="root">
-    <div class="main">
+  <body>
+    <div id="main">
 
       <div id="result">
+        <div id="result-sub">
+          <div class="result-line" id="result-line0">
+            <i>1.</i> <p class="result-line-text" id="result-line-text0">Some output.</p>
+          </div>
+          <div class="result-line" id="result-line1">
+            <i>2.</i> <p class="result-line-text" id="result-line-text1">Next output.</p>
+          </div>
 
+          <div class="result-line" id="result-line2">
+            <i>3.</i> <p class="result-line-text" id="result-line-text2">Some output.</p>
+          </div>
+          <div class="result-line" id="result-line3">
+            <i>4.</i> <p class="result-line-text" id="result-line-text3">Next output.</p>
+          </div>
+
+          <div class="result-line" id="result-line4">
+            <i>5.</i> <p class="result-line-text" id="result-line-text4">Some output.</p>
+          </div>
+          <div class="result-line" id="result-line5">
+            <i>6.</i> <p class="result-line-text" id="result-line-text5">Next output.</p>
+          </div>
+
+        </div>
       </div>
 
       <div id="stdin">
-        <input id="primary" />
+        <input type="text" id="primary" autofocus autocomplete="on" placeholder="?">
       </div>
 
-    </div>
+      <a class="translatable" href="#result-line0" id="scroll-to" data-i10n-id="page:scroll-to"></a> <input type="number" id="scroll-input" placeholder="1" min="1">
 
+      <select id="i10n-selection">
+
+      </select>
+    </div>
   </body>
 </html>
