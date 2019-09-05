@@ -1,8 +1,21 @@
-#main {
-  /*width: 100vw;
-  height: 100vh;*/
+html,body{margin:0;padding:0;}
+/*h1,p{margin:0 0 1em}*/
+
+#grid-root {
   display: grid;
+  grid-template-columns: auto auto auto;
+  grid-gap: 10px;
+  background-color: #000;
+  height: 100vh;
+}
+
+.grid-item {
   text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+  overflow: auto;
+
+  color: #fff;
 }
 
 #result {
@@ -16,7 +29,6 @@
   border-radius: 25px;
   box-shadow: -5px -5px #666;
 
-  overflow: auto;
   */
 
   grid-row-start: 1;
@@ -33,24 +45,37 @@
 .result-line {
   font-family: monospace;
   text-align: left;
-  margin: auto;
 }
 
 .result-line > i {
   font-size: 12px;
   line-height: .7;
+  padding-left: 4px;
 }
 
 .result-line-text {
   font-size: 17px;
   text-align: left;
   padding-left: 16px;
-  margin: auto;
+  /*
+  margin: auto;*/
+}
+
+#page-controls {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+#game-controls {
+  grid-column: 3;
+  grid-row: 3;
 }
 
 #stdin {
   font-size: 17px;
-  padding: 20px;
+
+  grid-column: 2;
+  grid-row: 3;
 }
 
 #scroll-input {

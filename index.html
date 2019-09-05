@@ -7,16 +7,14 @@
 
     <link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="dist/index.css" />
 
-    <script type="text/javascript" src="dist/index.js" charset="utf-8" > </script>
+    <script async data-main="dist/main" src="dist/require.js" type="text/javascript" charset="utf-8" > </script>
 
   </head>
   <body>
-    <div id="main">
-
-      <div class="grid-item">1</div>
+    <div id="grid-root">
 
       <div class="grid-item" id="result">
-        2
+        ???
         <div id="result-sub">
           <div class="result-line" id="result-line0">
             <i>1.</i> <p class="result-line-text" id="result-line-text0">Some output.</p>
@@ -39,25 +37,26 @@
             <i>6.</i> <p class="result-line-text" id="result-line-text5">Next output.</p>
           </div>
 
+          <div class="result-line" id="result-line6">
+            <i>7.</i> <p class="result-line-text" id="result-line-text6">Some output.</p>
+          </div>
+          <div class="result-line" id="result-line7">
+            <i>8.</i> <p class="result-line-text" id="result-line-text7">Next output.</p>
+          </div>
         </div>
       </div>
 
-      <div class="grid-item">3</div>
-      <div class="grid-item">4</div>
+      <div class="grid-item" id="page-controls">
+        <select id="i18n-selection">
+        </select>
+      </div>
 
       <div class="grid-item" id="stdin">
-        5
         <input type="text" id="primary" autofocus autocomplete="on" placeholder="?">
       </div>
 
-      <div class="grid-item" id="page-controls">
-        6
+      <div class="grid-item" id="game-controls">
         <a class="i18n-able" href="#result-line0" id="scroll-to" data-i10n-id="page:scroll-to"></a> <input type="number" id="scroll-input" placeholder="1" min="1">
-
-        <select id="i18n-selection">
-
-        </select>
-
       </div>
 
     </div>
