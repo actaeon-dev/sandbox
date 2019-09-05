@@ -13,7 +13,10 @@
   <body>
     <div id="main">
 
-      <div id="result">
+      <div class="grid-item">1</div>
+
+      <div class="grid-item" id="result">
+        2
         <div id="result-sub">
           <div class="result-line" id="result-line0">
             <i>1.</i> <p class="result-line-text" id="result-line-text0">Some output.</p>
@@ -39,15 +42,19 @@
         </div>
       </div>
 
-      <div id="stdin">
+      <div class="grid-item">3</div>
+      <div class="grid-item">4</div>
+
+      <div class="grid-item" id="stdin">
+        5
         <input type="text" id="primary" autofocus autocomplete="on" placeholder="?">
       </div>
 
-      <div id="page-controls">
+      <div class="grid-item" id="page-controls">
+        6
+        <a class="i18n-able" href="#result-line0" id="scroll-to" data-i10n-id="page:scroll-to"></a> <input type="number" id="scroll-input" placeholder="1" min="1">
 
-        <a class="translatable" href="#result-line0" id="scroll-to" data-i10n-id="page:scroll-to"></a> <input type="number" id="scroll-input" placeholder="1" min="1">
-
-        <select id="i10n-selection">
+        <select id="i18n-selection">
 
         </select>
 

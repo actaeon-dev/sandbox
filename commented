@@ -1,0 +1,18 @@
+//"ban-comma-operator": true,
+/* "allow-fast-null-checks",
+"allow-new",
+"allow-tagged-templates" */
+// "no-use-before-declare": true, deprecated
+// "allow-null-check",
+// "allow-undefined-check"
+"static-this": true // maybe not,
+
+"strict-boolean-expressions": [true, "ignore-rhs"], // maybe not
+  // "comment-type": true,
+  // "interface-over-type-literal": true,
+// {min-cases: 4}
+
+/* "alwaysStrict": true,
+"strictBindCallApply": true,
+"strictPropertyInitialization": true,
+"strictNullChecks": true, */
