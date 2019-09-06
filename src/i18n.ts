@@ -4,20 +4,24 @@ import * as dom from './lib/dom';
 /** a */
 const DOCUMENT_PATH_TEMPLATE = 'data/i18n/%s.json';
 /** a */
-const ROOT_DOCUMENT = 'i18n';
+export const ROOT_DOCUMENT = 'i18n';
 /** a */
 const CLASS_TRANSLATABLE = 'translatable';
 /** a */
 const SPECIAL_DATA_ID = 'data-i18n-id';
 /** a */
 const ID_I18N_SELECTION = 'i18n-selection';
+/** a */
+const MISSING_TRANSLATION = '(missing translation)';
+/** a */
+const FORMAT_REPLACE = '%s';
 
 /**
  * Locale-describer
  */
-interface I18nManifest {
+export interface I18nManifest {
   /** Available locales, not the total list of files in data/i18n */
-  readonly available : string[];
+  readonly available : Map<string, string>;
   /** The default locale, for initialisation and fallback purposes. */
   readonly default   : string;
 }
@@ -48,7 +52,13 @@ interface Locale {
   readonly output : GameTranslationTarget;
 }
 
-/** describes the current page locale status */
+/** any document in data/i18n other than the schema */
+export type I18nDocument = I18nManifest | Locale;
+
+// type LocaleID = string;
+
+/** data class describing the current page locale status */
+/* data */
 class LocaleState {
   /** active locale */
   public readonly current : Locale;
@@ -71,7 +81,7 @@ class LocaleState {
           `ERROR: no translation found anywhere for field: ${field} id: ${id}`,
         );
 
-        return '(missing translation)';
+        return MISSING_TRANSLATION;
       }
 
       return fal;
@@ -81,68 +91,71 @@ class LocaleState {
   }
 }
 
-/** a */
+/** non-data class handling current page locale */
+export class LocaleHandler {
 
-/** a  */
-export async function get_available_locales () : Promise<string[]> {
-  return fetch( DOCUMENT_PATH_TEMPLATE.replace('%s', ROOT_DOCUMENT) )
-    .then( (response : Response) : Promise<I18nManifest> => response.json()
-      .then( (x : { }) => <I18nManifest> x ) )
-    .then( (manifest : I18nManifest) : string[] => manifest.available );
-}
+  /** a */
+  private readonly active : LocaleState;
 
-function get_locale_from_dom_state () : LocaleState {
-  return new LocaleState(
-    dom.getElementById(ID_I18N_SELECTION),
+  /** a */
+  private readonly manifest : I18nManifest;
 
-  );
-}
+  constructor (manifest : I18nManifest, dfault : Locale) {
+    this.manifest = manifest;
+    this.active = new LocaleState( dfault, dfault );
+  }
 
-/**
- * Blah
- */
-export function translate_page () : void {
-  const locale : LocaleState = get_locale_from_dom_state();
-  const candidates : HTMLElement[] = <HTMLElement[]> Array.from(
-    dom.getElementsByClassName(CLASS_TRANSLATABLE) );
-  for (const c of candidates) {
-    const id = c.getAttribute(SPECIAL_DATA_ID);
-    if (id !== null) {
-      c.innerText = locale.get_id('page', id);
+  /** a */
+  public translate_page () : void {
+    // const locale : LocaleState = get_locale_from_dom_state();
+    const candidates = <HTMLElement[]> Array.from(
+      <HTMLCollectionOf<Element>> dom.getElementsByClassName(CLASS_TRANSLATABLE) );
+
+    for (const c of candidates) {
+      const id = c.getAttribute(SPECIAL_DATA_ID);
+      if (id !== null) {
+        c.innerText = this.active.get_id('page', id);
+      }
+    }
+    // populate all class=translatable nodes given their data-i18n-id value
+  }
+
+  /** a */
+  public populate_locale_selection () : void {
+    console.log(`available: ${this.manifest.available.toString()}`);
+
+    const i18n_selection = dom.getElementById(ID_I18N_SELECTION);
+
+    for (const { '0': id, '1': human_str } of this.manifest.available) {
+
+      const option = dom.createElement('option')
+          .setAttribute('id', 'locale-' + id)
+          .setAttribute('name', id);
+      // want to display the human-readable name of the locale here but that
+      //  requires loading every locale just to get one field
+      //  maybe there's a better approach to the data, for now just the ID will appear
+      option.appendChild( window.document.createTextNode( human_str ) );
+
+      i18n_selection.insertAdjacentElement( 'beforeend', option );
     }
   }
-  // populate all class=translatable nodes given their data-i18n-id value
 }
 
-/**
- * Blah
- */
-export async function populate_locale_selection () : Promise<void> {
-  // const data : string[] = async () => i18n_get_available_translations();
-  // const sel: HTMLSelectElement =
-  //  <HTMLSelectElement> getElementById(' i18n-selection');
-  // for each locale listed in data/ i18n/ i18n.json, then add it as an
-  //  <option> to the selector
+/** a */
+async function _load_i18n_document (id : string) : Promise<I18nDocument> {
 
-  const available : string[] = await get_available_locales();
-    // .then((x : string[]) : string[] => x )
-    // .catch((err : TypeError) : never => { throw err; } ) );
+  return fetch( DOCUMENT_PATH_TEMPLATE.replace(FORMAT_REPLACE, id) )
+    .then( (response : Response) : Promise<I18nManifest | Locale> => response.json() )
+    .then( (x : { }) => <I18nManifest | Locale> x );
+    // .then( (manifest : I18nManifest | Locale) : string[] => manifest.available );
+}
 
-  console.log(`available: ${available.toString()}`);
+/** a  */
+export async function load_i18n_manifest () : Promise<I18nManifest> {
+  return <Promise<I18nManifest>> _load_i18n_document(ROOT_DOCUMENT);
+}
 
-  const i18n_selection = dom.getElementById(ID_I18N_SELECTION);
-
-  for (const locale of available) {
-    const option : HTMLOptionElement = <HTMLOptionElement> dom.createElement('option');
-    option.setAttribute('id', 'locale-' + locale);
-    option.setAttribute('name', locale);
-    // want to display the human-readable name of the locale here but that
-    //  requires loading every locale just to get one field
-    //  maybe there's a better approach to the data, for now just the ID will appear
-    option.appendChild(window.document.createTextNode( locale ) );
-
-    i18n_selection.insertAdjacentElement( 'beforeend', option );
-  }
-
-  // window.console.log('finished pop');
+/** a */
+export async function load_locale_document (id : string) : Promise<Locale> {
+  return <Promise<Locale>> _load_i18n_document(id);
 }

@@ -25,7 +25,9 @@
 
     "strict": true,
 
+    "downlevelIteration": true,
     "keyofStringsOnly": true,
+
     "locale": "en-us",
 
     "lib": [ "dom", "es2015" ],

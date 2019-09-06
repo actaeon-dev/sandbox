@@ -1,3 +1,16 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,6 +47,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -62,11 +86,38 @@ define("lib/dom", ["require", "exports"], function (require, exports) {
     exports.getElementsByClassName = getElementsByClassName;
     /** a */
     function createElement(name) {
-        return (window.document.createElement(name) || (function () {
-            throw new Error('can\'t create new element: ' + name);
-        }));
+        return (window.document.createElement(name)
+            || (function () {
+                throw new Error('can\'t create new element: ' + name);
+            }));
     }
     exports.createElement = createElement;
+    /** a */
+    var ChainableElement = /** @class */ (function (_super) {
+        __extends(ChainableElement, _super);
+        function ChainableElement() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /** a */
+        ChainableElement.prototype.setAttribute = function (name, value) {
+            this.setAttribute(name, value);
+            return this;
+        };
+        return ChainableElement;
+    }(Element));
+    /** a */
+    var ChainableHTMLElement = /** @class */ (function (_super) {
+        __extends(ChainableHTMLElement, _super);
+        function ChainableHTMLElement() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /** a */
+        ChainableHTMLElement.prototype.setAttribute = function (name, value) {
+            this.setAttribute(name, value);
+            return this;
+        };
+        return ChainableHTMLElement;
+    }(HTMLElement));
 });
 define("i18n", ["require", "exports", "lib/dom"], function (require, exports, dom) {
     "use strict";
@@ -76,12 +127,20 @@ define("i18n", ["require", "exports", "lib/dom"], function (require, exports, do
     /** a */
     var DOCUMENT_PATH_TEMPLATE = 'data/i18n/%s.json';
     /** a */
-    var ROOT_DOCUMENT = 'i18n';
+    exports.ROOT_DOCUMENT = 'i18n';
     /** a */
     var CLASS_TRANSLATABLE = 'translatable';
     /** a */
     var SPECIAL_DATA_ID = 'data-i18n-id';
-    /** describes the current page locale status */
+    /** a */
+    var ID_I18N_SELECTION = 'i18n-selection';
+    /** a */
+    var MISSING_TRANSLATION = '(missing translation)';
+    /** a */
+    var FORMAT_REPLACE = '%s';
+    // type LocaleID = string;
+    /** data class describing the current page locale status */
+    /* data */
     var LocaleState = /** @class */ (function () {
         function LocaleState(current, fallback) {
             this.current = current;
@@ -94,7 +153,7 @@ define("i18n", ["require", "exports", "lib/dom"], function (require, exports, do
                 var fal = this.fallback[field].get(id);
                 if (fal === undefined) {
                     console.error("ERROR: no translation found anywhere for field: " + field + " id: " + id);
-                    return '(missing translation)';
+                    return MISSING_TRANSLATION;
                 }
                 return fal;
             }
@@ -102,66 +161,92 @@ define("i18n", ["require", "exports", "lib/dom"], function (require, exports, do
         };
         return LocaleState;
     }());
-    /** a */
-    /** a  */
-    function get_available_locales() {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, fetch(DOCUMENT_PATH_TEMPLATE.replace('%s', ROOT_DOCUMENT))
-                        .then(function (response) { return response.json()
-                        .then(function (x) { return x; }); })
-                        .then(function (manifest) { return manifest.available; })];
-            });
-        });
-    }
-    exports.get_available_locales = get_available_locales;
-    /**
-     * Blah
-     */
-    function translate_page(locale) {
-        var candidates = Array.from(dom.getElementsByClassName(CLASS_TRANSLATABLE));
-        for (var _i = 0, candidates_1 = candidates; _i < candidates_1.length; _i++) {
-            var c = candidates_1[_i];
-            var id = c.getAttribute(SPECIAL_DATA_ID);
-            if (id !== null) {
-                c.innerText = locale.get_id('page', id);
-            }
+    /** non-data class handling current page locale */
+    var LocaleHandler = /** @class */ (function () {
+        function LocaleHandler(manifest, dfault) {
+            this.manifest = manifest;
+            this.active = new LocaleState(dfault, dfault);
         }
-        // populate all class=translatable nodes given their data-i18n-id value
-    }
-    exports.translate_page = translate_page;
-    /**
-     * Blah
-     */
-    function populate_locale_selection() {
-        return __awaiter(this, void 0, void 0, function () {
-            var available, i18n_selection, _i, available_1, locale, option;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, get_available_locales()];
-                    case 1:
-                        available = _a.sent();
-                        // .then((x : string[]) : string[] => x )
-                        // .catch((err : TypeError) : never => { throw err; } ) );
-                        console.log("available: " + available.toString());
-                        i18n_selection = dom.getElementById('i18n-selection');
-                        for (_i = 0, available_1 = available; _i < available_1.length; _i++) {
-                            locale = available_1[_i];
-                            option = dom.createElement('option');
-                            option.setAttribute('id', 'locale-' + locale);
-                            option.setAttribute('name', locale);
-                            // want to display the human-readable name of the locale here but that
-                            //  requires loading every locale just to get one field
-                            //  maybe there's a better approach to the data, for now just the ID will appear
-                            option.appendChild(window.document.createTextNode(locale));
-                            i18n_selection.insertAdjacentElement('beforeend', option);
-                        }
-                        return [2 /*return*/];
+        /** a */
+        LocaleHandler.prototype.translate_page = function () {
+            var e_1, _a;
+            // const locale : LocaleState = get_locale_from_dom_state();
+            var candidates = Array.from(dom.getElementsByClassName(CLASS_TRANSLATABLE));
+            try {
+                for (var candidates_1 = __values(candidates), candidates_1_1 = candidates_1.next(); !candidates_1_1.done; candidates_1_1 = candidates_1.next()) {
+                    var c = candidates_1_1.value;
+                    var id = c.getAttribute(SPECIAL_DATA_ID);
+                    if (id !== null) {
+                        c.innerText = this.active.get_id('page', id);
+                    }
                 }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (candidates_1_1 && !candidates_1_1.done && (_a = candidates_1["return"])) _a.call(candidates_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            // populate all class=translatable nodes given their data-i18n-id value
+        };
+        /** a */
+        LocaleHandler.prototype.populate_locale_selection = function () {
+            var e_2, _a;
+            console.log("available: " + this.manifest.available.toString());
+            var i18n_selection = dom.getElementById(ID_I18N_SELECTION);
+            try {
+                for (var _b = __values(this.manifest.available), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var _d = _c.value, id = _d["0"], human_str = _d["1"];
+                    var option = dom.createElement('option')
+                        .setAttribute('id', 'locale-' + id)
+                        .setAttribute('name', id);
+                    // want to display the human-readable name of the locale here but that
+                    //  requires loading every locale just to get one field
+                    //  maybe there's a better approach to the data, for now just the ID will appear
+                    option.appendChild(window.document.createTextNode(human_str));
+                    i18n_selection.insertAdjacentElement('beforeend', option);
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b["return"])) _a.call(_b);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
+        };
+        return LocaleHandler;
+    }());
+    exports.LocaleHandler = LocaleHandler;
+    /** a */
+    function _load_i18n_document(id) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, fetch(DOCUMENT_PATH_TEMPLATE.replace(FORMAT_REPLACE, id))
+                        .then(function (response) { return response.json(); })
+                        .then(function (x) { return x; })];
             });
         });
     }
-    exports.populate_locale_selection = populate_locale_selection;
+    /** a  */
+    function load_i18n_manifest() {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, _load_i18n_document(exports.ROOT_DOCUMENT)];
+            });
+        });
+    }
+    exports.load_i18n_manifest = load_i18n_manifest;
+    /** a */
+    function load_locale_document(id) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, _load_i18n_document(id)];
+            });
+        });
+    }
+    exports.load_locale_document = load_locale_document;
 });
 define("main", ["require", "exports", "i18n", "lib/dom"], function (require, exports, i18n, dom) {
     "use strict";
@@ -181,11 +266,12 @@ define("main", ["require", "exports", "i18n", "lib/dom"], function (require, exp
         window.console.log("key: " + k.key + " mod: " + k.getModifierState(k.key));
     }
     /** a */
-    function make_listeners() {
+    function make_listeners(lh) {
         return __awaiter(this, void 0, void 0, function () {
-            var input_listeners, primary, _i, input_listeners_1, l;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var input_listeners, primary, input_listeners_1, input_listeners_1_1, l;
+            var e_3, _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
                         input_listeners = [
                             ['keydown', see_keyboardevent],
@@ -193,19 +279,30 @@ define("main", ["require", "exports", "i18n", "lib/dom"], function (require, exp
                             ['keyup', see_keyboardevent],
                         ];
                         primary = dom.getElementById('primary');
-                        for (_i = 0, input_listeners_1 = input_listeners; _i < input_listeners_1.length; _i++) {
-                            l = input_listeners_1[_i];
-                            primary.addEventListener(l[0], l[1]);
+                        try {
+                            for (input_listeners_1 = __values(input_listeners), input_listeners_1_1 = input_listeners_1.next(); !input_listeners_1_1.done; input_listeners_1_1 = input_listeners_1.next()) {
+                                l = input_listeners_1_1.value;
+                                primary.addEventListener(l[0], l[1]);
+                            }
+                        }
+                        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                        finally {
+                            try {
+                                if (input_listeners_1_1 && !input_listeners_1_1.done && (_a = input_listeners_1["return"])) _a.call(input_listeners_1);
+                            }
+                            finally { if (e_3) throw e_3.error; }
                         }
                         dom.getElementById('scroll-input')
                             .addEventListener('change', change_scroll_to_anchor);
                         dom.getElementById('i18n-selection')
-                            .addEventListener('change', i18n.translate_page);
+                            // why is .bind necessary? it's already called on lh, a LocaleHandler() instance
+                            //   NOT the LocaleHandler typename
+                            .addEventListener('change', lh.translate_page.bind(lh));
                         // window.console.log('finished make_listeners');
                         return [4 /*yield*/, new Promise(function () { })];
                     case 1:
                         // window.console.log('finished make_listeners');
-                        _a.sent();
+                        _b.sent();
                         return [2 /*return*/];
                 }
             });
@@ -214,18 +311,21 @@ define("main", ["require", "exports", "i18n", "lib/dom"], function (require, exp
     /** a */
     function main() {
         return __awaiter(this, void 0, void 0, function () {
-            var l, p;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        l = make_listeners();
-                        p = i18n.populate_translation_selection();
-                        return [4 /*yield*/, l];
+            var manifest, dfault, locale_handler, listen, _a, _b, _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0: return [4 /*yield*/, i18n.load_i18n_manifest()];
                     case 1:
-                        _a.sent();
-                        return [4 /*yield*/, p];
+                        manifest = _d.sent(), dfault = i18n.load_locale_document(manifest["default"]);
+                        _b = (_a = i18n.LocaleHandler).bind;
+                        _c = [void 0, manifest];
+                        return [4 /*yield*/, dfault];
                     case 2:
-                        _a.sent();
+                        locale_handler = new (_b.apply(_a, _c.concat([_d.sent()])))(), listen = make_listeners(locale_handler);
+                        locale_handler.populate_locale_selection();
+                        return [4 /*yield*/, listen];
+                    case 3:
+                        _d.sent();
                         console.log('done!');
                         return [2 /*return*/];
                 }
@@ -235,4 +335,4 @@ define("main", ["require", "exports", "i18n", "lib/dom"], function (require, exp
     main()
         .then()["catch"](function (err) { throw err; });
 });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibWFpbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9saWIvZG9tLnRzIiwiLi4vc3JjL2kxOG4udHMiLCIuLi9zcmMvbWFpbi50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0lBQUEsUUFBUTtJQUNSLFNBQWdCLGNBQWMsQ0FBRSxFQUFXO1FBQ3pDLE9BQU8sQ0FDTCxNQUFNLENBQUMsUUFBUSxDQUFDLGNBQWMsQ0FBQyxFQUFFLENBQUM7ZUFDN0IsQ0FBRSxDQUFDO2dCQUNKLE1BQU0sSUFBSSxLQUFLLENBQUMscUNBQW1DLEVBQUksQ0FBQyxDQUFDO1lBQzNELENBQUMsQ0FBQyxFQUFFLENBQUUsQ0FDVCxDQUFDO0lBQ0osQ0FBQztJQVBELHdDQU9DO0lBRUQsUUFBUTtJQUNSLFNBQWdCLHNCQUFzQixDQUFFLElBQWE7UUFDbkQsT0FBTyxDQUNMLE1BQU0sQ0FBQyxRQUFRLENBQUMsc0JBQXNCLENBQUMsSUFBSSxDQUFDO2VBQ3ZDLENBQUUsQ0FBQztnQkFDSixNQUFNLElBQUksS0FBSyxDQUFDLGdFQUE4RCxJQUFNLENBQUMsQ0FBQztZQUN4RixDQUFDLENBQUMsRUFBRSxDQUFFLENBQ1QsQ0FBQztJQUNKLENBQUM7SUFQRCx3REFPQztJQUVELFFBQVE7SUFDUixTQUFnQixhQUFhLENBQUUsSUFBYTtRQUMxQyxPQUFPLENBQUMsTUFBTSxDQUFDLFFBQVEsQ0FBQyxhQUFhLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBRTtZQUMvQyxNQUFNLElBQUksS0FBSyxDQUFDLDZCQUE2QixHQUFHLElBQUksQ0FBQyxDQUFDO1FBQUMsQ0FBQyxDQUFDLENBQUUsQ0FBQztJQUNoRSxDQUFDO0lBSEQsc0NBR0M7Ozs7OztJQ3ZCRCxxQ0FBcUM7SUFFckMsUUFBUTtJQUNSLElBQU0sc0JBQXNCLEdBQUcsbUJBQW1CLENBQUM7SUFDbkQsUUFBUTtJQUNSLElBQU0sYUFB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
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibWFpbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9saWIvZG9tLnRzIiwiLi4vc3JjL2kxOG4udHMiLCIuLi9zcmMvbWFpbi50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0lBQUEsUUFBUTtJQUNSLFNBQWdCLGNBQWMsQ0FBRSxFQUFXO1FBQ3pDLE9BQU8sQ0FDTCxNQUFNLENBQUMsUUFBUSxDQUFDLGNBQWMsQ0FBQyxFQUFFLENBQUM7ZUFDN0IsQ0FBRSxDQUFDO2dCQUNKLE1BQU0sSUFBSSxLQUFLLENBQUMscUNBQW1DLEVBQUksQ0FBQyxDQUFDO1lBQzNELENBQUMsQ0FBQyxFQUFFLENBQUUsQ0FDVCxDQUFDO0lBQ0osQ0FBQztJQVBELHdDQU9DO0lBRUQsUUFBUTtJQUNSLFNBQ0Esc0JBQXNCLENBQUUsSUFBYTtRQUNuQyxPQUE0QyxDQUMxQyxNQUFNLENBQUMsUUFBUSxDQUFDLHNCQUFzQixDQUFDLElBQUksQ0FBQztlQUN2QyxDQUFFLENBQUM7Z0JBQ0osTUFBTSxJQUFJLEtBQUssQ0FBQyxnRUFBOEQsSUFBTSxDQUFDLENBQUM7WUFDeEYsQ0FBQyxDQUFDLEVBQUUsQ0FBRSxDQUNULENBQUM7SUFDSixDQUFDO0lBUkQsd0RBUUM7SUFFRCxRQUFRO0lBQ1IsU0FBZ0IsYUFBYSxDQUFFLElBQWE7UUFDMUMsT0FBOEIsQ0FDNUIsTUFBTSxDQUFDLFFBQVEsQ0FBQyxhQUFhLENBQUMsSUFBSSxDQUFDO2VBQzlCLENBQUU7Z0JBQ0gsTUFBTSxJQUFJLEtBQUssQ0FBQyw2QkFBNkIsR0FBRyxJQUFJLENBQUMsQ0FBQztZQUFDLENBQUMsQ0FBQyxDQUM5RCxDQUFDO0lBQ0osQ0FBQztJQU5ELHNDQU1DO0lBRUQsUUFBUTtJQUNSO1FBQStCLG9DQUFPO1FBQXRDOztRQU9BLENBQUM7UUFOQyxRQUFRO1FBQ0Qs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

@@ -19,7 +19,7 @@ function see_keyboardevent (k : KeyboardEvent) : void {
 }
 
 /** a */
-async function make_listeners () : Promise<void> {
+async function make_listeners (lh : i18n.LocaleHandler) : Promise<void> {
   const input_listeners : Array<[string, Function]> = [
     ['keydown', see_keyboardevent],
     ['keypress', see_keyboardevent],
@@ -36,7 +36,9 @@ async function make_listeners () : Promise<void> {
     .addEventListener('change', <EventListener> change_scroll_to_anchor);
 
   dom.getElementById('i18n-selection')
-    .addEventListener('change', <EventListener> i18n.translate_page);
+    // why is .bind necessary? it's already called on lh, a LocaleHandler() instance
+    //   NOT the LocaleHandler typename
+    .addEventListener('change', <EventListener> lh.translate_page.bind(lh));
 
   // window.console.log('finished make_listeners');
   await new Promise(() => { /* */ });
@@ -44,11 +46,17 @@ async function make_listeners () : Promise<void> {
 
 /** a */
 async function main () : Promise<void> {
-  const l = make_listeners();
-  const p = i18n.populate_locale_selection();
 
-  await l;
-  await p;
+  const
+    manifest = await i18n.load_i18n_manifest(),
+    dfault = i18n.load_locale_document(manifest.default),
+    locale_handler = new i18n.LocaleHandler(manifest, await dfault),
+
+    listen = make_listeners(locale_handler);
+
+  locale_handler.populate_locale_selection();
+
+  await listen;
 
   console.log('done!');
 }
