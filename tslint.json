@@ -93,16 +93,16 @@
       "use-isnan": true,
 
 
-      "cyclomatic-complexity": [true, 40],
+      "cyclomatic-complexity": [true, 10],
       "deprecation": true,
-      "invalid-void": true,
+      "invalid-void": false, // wait for palantir/tslint#4839
       "max-classes-per-file": [true, 10, "exclude-class-expressions"],
       "max-file-line-count": [true, 1000],
       "no-default-export": true,
       "no-default-import": true,
       "no-duplicate-imports": [true, {"allow-namespace-imports": true}],
       "no-mergeable-namespace": true,
-      "no-require-imports": true,
+      "no-require-imports": false, // ????
       "object-literal-sort-keys": [
         true,
         "ignore-blank-lines",

@@ -1,3 +1,5 @@
 {
-  "available": [ "en-US" ]
+  "available": [ "en-US" ],
+
+  "default": "en-US" 
 }

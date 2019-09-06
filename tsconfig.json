@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "target": "es3",
-    "outDir": "dist",
+    "outFile": "dist/main.js",
     "rootDir": "src",
     "module": "amd",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    
+
     "inlineSourceMap": true,
 
     "preserveConstEnums": true,
@@ -31,7 +31,7 @@
     "lib": [ "dom", "es2015" ],
     "preserveWatchOutput": true,
 
-    "traceResolution": true,
+    "traceResolution": false,
     "listEmittedFiles": true,
     "listFiles": true,
     "pretty": true
