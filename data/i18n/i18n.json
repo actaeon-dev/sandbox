@@ -1,9 +1,9 @@
 {
 
   "avaiable": {
-    "en-US": "English (American)",
-    "es-MX": "Español (Mexico)"
-  }
+    "en-US": "English (United States)",
+    "es-MX": "Español (México)"
+  },
 
-  "default": "en-US",
+  "default": "en-US"
 }

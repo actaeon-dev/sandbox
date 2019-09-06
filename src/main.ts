@@ -15,7 +15,10 @@ function change_scroll_to_anchor () : void {
 
 /** a */
 function see_keyboardevent (k : KeyboardEvent) : void {
-  window.console.log(`key: ${k.key} mod: ${k.getModifierState(k.key)}`);
+  window.console.log(
+    `${new Date()
+        .getMilliseconds()
+        .toString()} key: ${k.key} mod: ${k.getModifierState( k.key )}`);
 }
 
 /** a */
@@ -53,6 +56,9 @@ async function main () : Promise<void> {
     locale_handler = new i18n.LocaleHandler(manifest, await dfault),
 
     listen = make_listeners(locale_handler);
+
+  console.log(manifest.available);
+  console.log(manifest.default);
 
   locale_handler.populate_locale_selection();
 

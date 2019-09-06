@@ -1,5 +1,5 @@
 {
-  "name": "English (American)",
+  "name": "English (United States)",
   "id": "en-US",
   "complete": true,
 
@@ -17,18 +17,17 @@
     "noun": {
       "a1": "rock",
       "b2": "paper",
-      "c3": "scissiors",
+      "c3": "scissiors"
     },
     "dialogue": {
       "a1": "Hello there.",
       "b2": "Search me, but you'd better get them quickly.",
-      "c3": "There must be cure for it!",
+      "c3": "There must be cure for it!"
     },
     "description": {
-      "a1": ["short", "long"]
-      "b2": ["short", "long"]
+      "a1": ["short", "long"],
+      "b2": ["short", "long"],
       "c3": ["short", "long"]
-    },
-
+    }
   }
 }
