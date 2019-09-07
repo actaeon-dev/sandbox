@@ -1,4 +1,4 @@
-/** a */
+/** need to be able to save/load states, from client or server */
 export class GameState {
 
   /** a */
