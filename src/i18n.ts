@@ -153,6 +153,7 @@ export class LocaleHandler {
       || ( undefined === this.manifest.available.get(new_locale_id) )
     ) { return; }
 
+    // avoid scope pollution
     await (async () => {
       const cache_val = this.cache.get(new_locale_id);
       if (new_locale_id === this.active.current.id) {

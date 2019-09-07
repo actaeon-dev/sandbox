@@ -5,7 +5,7 @@ export function object_entries<rhs> (obj : { }) : Array<[string, rhs]> {
   const resArray = new Array(i); // preallocate the Array
   while (i !== 0) {
     // tslint:disable-next-line
-    resArray[i] = [ ownProps[i], <rhs> (obj as any)[ ownProps[i] ] ];
+    resArray[i] = [ ownProps[i], <rhs> Reflect.get(obj, ownProps[i]) ];
     i -= 1;
   }
 
@@ -16,8 +16,7 @@ export function object_entries<rhs> (obj : { }) : Array<[string, rhs]> {
 function _native_map_from_object <B> (obj : { }) : Map<string, B> {
 
   return new Map<string, B>(
-    // tslint:disable-next-line
-    (Object as any)['entries'](obj)
+    <Array<[string, B]>> ( <Function> Reflect.get(Object, 'entries') )(obj),
   );
 }
 
