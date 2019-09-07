@@ -10,7 +10,7 @@
     "inlineSourceMap": true,
 
     "preserveConstEnums": true,
-    "removeComments": false,
+    "removeComments": true,
     "forceConsistentCasingInFileNames": true,
 
     "noEmitOnError": true,
