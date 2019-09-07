@@ -3,7 +3,7 @@ import * as i18n from './i18n';
 import * as dom from './lib/dom';
 // import dom = require('./lib/dom');
 
-/** a */
+/** change which line the scroll-to anchor is a link */
 function change_scroll_to_anchor () : void {
   const scroll_input = <HTMLInputElement> dom.getElementById('scroll-input');
 
@@ -13,7 +13,7 @@ function change_scroll_to_anchor () : void {
     .setAttribute('href', `#result-line${scrollpos}`);
 }
 
-/** a */
+/** debug */
 function see_keyboardevent (k : KeyboardEvent) : void {
   window.console.log(
     `${new Date()
@@ -21,7 +21,7 @@ function see_keyboardevent (k : KeyboardEvent) : void {
         .toString()} key: ${k.key} mod: ${k.getModifierState( k.key )}`);
 }
 
-/** a */
+/** create event listeners for page elements */
 async function make_listeners (lh : i18n.LocaleHandler) : Promise<void> {
   const input_listeners : Array<[string, Function]> = [
     ['keydown', see_keyboardevent],
@@ -47,20 +47,21 @@ async function make_listeners (lh : i18n.LocaleHandler) : Promise<void> {
   await new Promise(() => { /* */ });
 }
 
-/** a */
+/** entry point */
 async function main () : Promise<void> {
+  console.log('started!');
 
   const
     manifest = await i18n.load_i18n_manifest(),
-    dfault = i18n.load_locale_document(manifest.default),
-    locale_handler = new i18n.LocaleHandler(manifest, await dfault),
-
+    dfault = await i18n.load_locale_document(manifest.default),
+    locale_handler = new i18n.LocaleHandler(manifest, dfault),
     listen = make_listeners(locale_handler);
 
-  console.log(manifest.available);
-  console.log(manifest.default);
+  console.log(manifest);
 
-  locale_handler.populate_locale_selection();
+  await locale_handler.populate_locale_selection();
+
+  await locale_handler.translate_page();
 
   await listen;
 

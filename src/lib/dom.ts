@@ -9,9 +9,8 @@ export function getElementById (id : string) : HTMLElement {
 }
 
 /** a */
-export function
-getElementsByClassName (name : string) : HTMLCollectionOf<ChainableElement> {
-  return <HTMLCollectionOf<ChainableElement>> (
+export function getElementsByClassName (name : string) : HTMLCollectionOf<Element> {
+  return (
     window.document.getElementsByClassName(name)
       || ( (() : never => {
         throw new Error(`getElementsByClassName: ??? error happened when processing ${name}`);
@@ -20,17 +19,15 @@ getElementsByClassName (name : string) : HTMLCollectionOf<ChainableElement> {
 }
 
 /** a */
-export function createElement (name : string) : ChainableHTMLElement {
-  return <ChainableHTMLElement> (
+export function createElement (name : string) : HTMLElement {
+  return (
     window.document.createElement(name)
       || ( () : never => {
         throw new Error('can\'t create new element: ' + name); })
   );
 }
 
-/** a */
-class ChainableElement extends Element {
-  /** a */
+/*class ChainableElement extends Element {
   public setAttribute (name : string, value : { }) : ChainableElement {
     this.setAttribute(name, value);
 
@@ -38,12 +35,11 @@ class ChainableElement extends Element {
   }
 }
 
-/** a */
 class ChainableHTMLElement extends HTMLElement {
-  /** a */
   public setAttribute (name : string, value : { }) : ChainableHTMLElement {
     this.setAttribute(name, value);
 
     return this;
   }
 }
+*/

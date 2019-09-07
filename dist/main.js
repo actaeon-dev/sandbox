@@ -1,16 +1,3 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -58,6 +45,26 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -92,44 +99,66 @@ define("lib/dom", ["require", "exports"], function (require, exports) {
             }));
     }
     exports.createElement = createElement;
-    /** a */
-    var ChainableElement = /** @class */ (function (_super) {
-        __extends(ChainableElement, _super);
-        function ChainableElement() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /** a */
-        ChainableElement.prototype.setAttribute = function (name, value) {
-            this.setAttribute(name, value);
-            return this;
-        };
-        return ChainableElement;
-    }(Element));
-    /** a */
-    var ChainableHTMLElement = /** @class */ (function (_super) {
-        __extends(ChainableHTMLElement, _super);
-        function ChainableHTMLElement() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /** a */
-        ChainableHTMLElement.prototype.setAttribute = function (name, value) {
-            this.setAttribute(name, value);
-            return this;
-        };
-        return ChainableHTMLElement;
-    }(HTMLElement));
 });
-define("i18n", ["require", "exports", "lib/dom"], function (require, exports, dom) {
+/*class ChainableElement extends Element {
+  public setAttribute (name : string, value : { }) : ChainableElement {
+    this.setAttribute(name, value);
+
+    return this;
+  }
+}
+
+class ChainableHTMLElement extends HTMLElement {
+  public setAttribute (name : string, value : { }) : ChainableHTMLElement {
+    this.setAttribute(name, value);
+
+    return this;
+  }
+}
+*/
+define("lib/tsext", ["require", "exports"], function (require, exports) {
+    "use strict";
+    exports.__esModule = true;
+    /** Object.entries polyfill */
+    function object_entries(obj) {
+        var ownProps = Object.keys(obj);
+        var i = ownProps.length;
+        var resArray = new Array(i); // preallocate the Array
+        while (i !== 0) {
+            // tslint:disable-next-line
+            resArray[i] = [ownProps[i], obj[ownProps[i]]];
+            i -= 1;
+        }
+        return resArray;
+    }
+    exports.object_entries = object_entries;
+    /** a */
+    function _native_map_from_object(obj) {
+        return new Map(
+        // tslint:disable-next-line
+        Object['entries'](obj));
+    }
+    /** a */
+    function _impl_map_from_object(obj) {
+        return new Map(object_entries(obj));
+    }
+    /** {} -> Map<> */
+    exports.map_from_object = (Object.hasOwnProperty('entries')
+        ? _native_map_from_object
+        : _impl_map_from_object);
+});
+define("i18n", ["require", "exports", "lib/dom", "lib/tsext"], function (require, exports, dom, tsext) {
     "use strict";
     exports.__esModule = true;
     dom = __importStar(dom);
+    tsext = __importStar(tsext);
     // import dom = require('./lib/dom');
     /** a */
     var DOCUMENT_PATH_TEMPLATE = 'data/i18n/%s.json';
     /** a */
     exports.ROOT_DOCUMENT = 'i18n';
     /** a */
-    var CLASS_TRANSLATABLE = 'translatable';
+    var CLASS_TRANSLATABLE = 'i18n-able';
     /** a */
     var SPECIAL_DATA_ID = 'data-i18n-id';
     /** a */
@@ -138,7 +167,6 @@ define("i18n", ["require", "exports", "lib/dom"], function (require, exports, do
     var MISSING_TRANSLATION = '(missing translation)';
     /** a */
     var FORMAT_REPLACE = '%s';
-    // type LocaleID = string;
     /** data class describing the current page locale status */
     /* data */
     var LocaleState = /** @class */ (function () {
@@ -167,73 +195,117 @@ define("i18n", ["require", "exports", "lib/dom"], function (require, exports, do
             this.manifest = manifest;
             this.active = new LocaleState(dfault, dfault);
         }
-        /** a */
+        /** what if we could write this as an unbound function without a state modification? */
         LocaleHandler.prototype.translate_page = function () {
-            var e_1, _a;
-            // const locale : LocaleState = get_locale_from_dom_state();
-            var candidates = Array.from(dom.getElementsByClassName(CLASS_TRANSLATABLE));
-            try {
-                for (var candidates_1 = __values(candidates), candidates_1_1 = candidates_1.next(); !candidates_1_1.done; candidates_1_1 = candidates_1.next()) {
-                    var c = candidates_1_1.value;
-                    var id = c.getAttribute(SPECIAL_DATA_ID);
-                    if (id !== null) {
-                        c.innerText = this.active.get_id('page', id);
+            return __awaiter(this, void 0, void 0, function () {
+                var new_locale, _a, _b, candidates, max_split, candidates_1, candidates_1_1, c, data_attr, parts;
+                var e_1, _c, _d;
+                return __generator(this, function (_e) {
+                    switch (_e.label) {
+                        case 0:
+                            new_locale = dom.getElementById(ID_I18N_SELECTION)
+                                .selectedOptions[0].getAttribute('name');
+                            if ((null === new_locale)
+                                || (undefined === this.manifest.available.get(new_locale))) {
+                                return [2 /*return*/];
+                            }
+                            _a = this;
+                            _b = LocaleState.bind;
+                            return [4 /*yield*/, load_locale_document(new_locale)];
+                        case 1:
+                            _a.active = new (_b.apply(LocaleState, [void 0, _e.sent(),
+                                this.active.fallback]))();
+                            console.log('translating page to', this.active);
+                            candidates = Array.from(dom.getElementsByClassName(CLASS_TRANSLATABLE));
+                            max_split = 2;
+                            try {
+                                for (candidates_1 = __values(candidates), candidates_1_1 = candidates_1.next(); !candidates_1_1.done; candidates_1_1 = candidates_1.next()) {
+                                    c = candidates_1_1.value;
+                                    data_attr = c.getAttribute(SPECIAL_DATA_ID);
+                                    if (data_attr !== null) {
+                                        parts = data_attr.split(':', max_split);
+                                        // console.log('translating element: ', parts, c);
+                                        c.innerText = (_d = this.active).get_id.apply(_d, __spread(parts));
+                                    }
+                                }
+                            }
+                            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                            finally {
+                                try {
+                                    if (candidates_1_1 && !candidates_1_1.done && (_c = candidates_1["return"])) _c.call(candidates_1);
+                                }
+                                finally { if (e_1) throw e_1.error; }
+                            }
+                            return [2 /*return*/];
                     }
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (candidates_1_1 && !candidates_1_1.done && (_a = candidates_1["return"])) _a.call(candidates_1);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-            // populate all class=translatable nodes given their data-i18n-id value
+                });
+            });
         };
         /** a */
         LocaleHandler.prototype.populate_locale_selection = function () {
-            var e_2, _a;
-            console.log("available: " + this.manifest.available.toString());
-            var i18n_selection = dom.getElementById(ID_I18N_SELECTION);
-            try {
-                for (var _b = __values(this.manifest.available), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var _d = _c.value, id = _d["0"], human_str = _d["1"];
-                    var option = dom.createElement('option')
-                        .setAttribute('id', 'locale-' + id)
-                        .setAttribute('name', id);
-                    // want to display the human-readable name of the locale here but that
-                    //  requires loading every locale just to get one field
-                    //  maybe there's a better approach to the data, for now just the ID will appear
-                    option.appendChild(window.document.createTextNode(human_str));
-                    i18n_selection.insertAdjacentElement('beforeend', option);
-                }
-            }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b["return"])) _a.call(_b);
-                }
-                finally { if (e_2) throw e_2.error; }
-            }
+            return __awaiter(this, void 0, void 0, function () {
+                var i18n_selection, _a, _b, _c, id, human_str, option;
+                var e_2, _d;
+                return __generator(this, function (_e) {
+                    i18n_selection = dom.getElementById(ID_I18N_SELECTION);
+                    try {
+                        for (_a = __values(this.manifest.available), _b = _a.next(); !_b.done; _b = _a.next()) {
+                            _c = _b.value, id = _c["0"], human_str = _c["1"];
+                            option = dom.createElement('option');
+                            option.setAttribute('id', 'locale-' + id);
+                            option.setAttribute('name', id);
+                            option.appendChild(window.document.createTextNode(human_str));
+                            i18n_selection.insertAdjacentElement('beforeend', option);
+                        }
+                    }
+                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                    finally {
+                        try {
+                            if (_b && !_b.done && (_d = _a["return"])) _d.call(_a);
+                        }
+                        finally { if (e_2) throw e_2.error; }
+                    }
+                    return [2 /*return*/];
+                });
+            });
         };
         return LocaleHandler;
     }());
     exports.LocaleHandler = LocaleHandler;
     /** a */
+    function _make_gtt(igtt) {
+        return ({
+            noun: tsext.map_from_object(igtt.noun),
+            dialogue: tsext.map_from_object(igtt.dialogue),
+            description: tsext.map_from_object(igtt.description),
+        });
+    }
+    /** a */
     function _load_i18n_document(id) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, fetch(DOCUMENT_PATH_TEMPLATE.replace(FORMAT_REPLACE, id))
-                        .then(function (response) { return response.json(); })
-                        .then(function (x) { return x; })];
+                        .then(function (response) { return response.text(); })];
             });
         });
     }
     /** a  */
     function load_i18n_manifest() {
         return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
             return __generator(this, function (_a) {
-                return [2 /*return*/, _load_i18n_document(exports.ROOT_DOCUMENT)];
+                return [2 /*return*/, _load_i18n_document(exports.ROOT_DOCUMENT)
+                        .then(function (json) { return __awaiter(_this, void 0, void 0, function () {
+                        var obj;
+                        return __generator(this, function (_a) {
+                            obj = JSON.parse(json);
+                            // console.log('intermediate manifest: ', obj);
+                            return [2 /*return*/, ({
+                                    available: tsext.map_from_object(obj.available),
+                                    "default": obj["default"],
+                                })];
+                        });
+                    }); })];
             });
         });
     }
@@ -241,8 +313,24 @@ define("i18n", ["require", "exports", "lib/dom"], function (require, exports, do
     /** a */
     function load_locale_document(id) {
         return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
             return __generator(this, function (_a) {
-                return [2 /*return*/, _load_i18n_document(id)];
+                return [2 /*return*/, _load_i18n_document(id)
+                        .then(function (json) { return __awaiter(_this, void 0, void 0, function () {
+                        var obj;
+                        return __generator(this, function (_a) {
+                            obj = JSON.parse(json);
+                            // console.log('intermediate locale: ', obj);
+                            return [2 /*return*/, ({
+                                    complete: obj.complete,
+                                    id: obj.id,
+                                    input_words: tsext.map_from_object(obj.input_words),
+                                    name: obj.name,
+                                    output: _make_gtt(obj.output),
+                                    page: tsext.map_from_object(obj.page),
+                                })];
+                        });
+                    }); })];
             });
         });
     }
@@ -254,20 +342,20 @@ define("main", ["require", "exports", "i18n", "lib/dom"], function (require, exp
     i18n = __importStar(i18n);
     dom = __importStar(dom);
     // import dom = require('./lib/dom');
-    /** a */
+    /** change which line the scroll-to anchor is a link */
     function change_scroll_to_anchor() {
         var scroll_input = dom.getElementById('scroll-input');
         var scrollpos = Math.abs(Number(scroll_input.value) - 1);
         dom.getElementById('scroll-to')
             .setAttribute('href', "#result-line" + scrollpos);
     }
-    /** a */
+    /** debug */
     function see_keyboardevent(k) {
         window.console.log(new Date()
             .getMilliseconds()
             .toString() + " key: " + k.key + " mod: " + k.getModifierState(k.key));
     }
-    /** a */
+    /** create event listeners for page elements */
     function make_listeners(lh) {
         return __awaiter(this, void 0, void 0, function () {
             var input_listeners, primary, input_listeners_1, input_listeners_1_1, l;
@@ -310,26 +398,30 @@ define("main", ["require", "exports", "i18n", "lib/dom"], function (require, exp
             });
         });
     }
-    /** a */
+    /** entry point */
     function main() {
         return __awaiter(this, void 0, void 0, function () {
-            var manifest, dfault, locale_handler, listen, _a, _b, _c;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
-                    case 0: return [4 /*yield*/, i18n.load_i18n_manifest()];
+            var manifest, dfault, locale_handler, listen;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log('started!');
+                        return [4 /*yield*/, i18n.load_i18n_manifest()];
                     case 1:
-                        manifest = _d.sent(), dfault = i18n.load_locale_document(manifest["default"]);
-                        _b = (_a = i18n.LocaleHandler).bind;
-                        _c = [void 0, manifest];
-                        return [4 /*yield*/, dfault];
+                        manifest = _a.sent();
+                        return [4 /*yield*/, i18n.load_locale_document(manifest["default"])];
                     case 2:
-                        locale_handler = new (_b.apply(_a, _c.concat([_d.sent()])))(), listen = make_listeners(locale_handler);
-                        console.log(manifest.available);
-                        console.log(manifest["default"]);
-                        locale_handler.populate_locale_selection();
-                        return [4 /*yield*/, listen];
+                        dfault = _a.sent(), locale_handler = new i18n.LocaleHandler(manifest, dfault), listen = make_listeners(locale_handler);
+                        console.log(manifest);
+                        return [4 /*yield*/, locale_handler.populate_locale_selection()];
                     case 3:
-                        _d.sent();
+                        _a.sent();
+                        return [4 /*yield*/, locale_handler.translate_page()];
+                    case 4:
+                        _a.sent();
+                        return [4 /*yield*/, listen];
+                    case 5:
+                        _a.sent();
                         console.log('done!');
                         return [2 /*return*/];
                 }
@@ -339,4 +431,4 @@ define("main", ["require", "exports", "i18n", "lib/dom"], function (require, exp
     main()
         .then()["catch"](function (err) { throw err; });
 });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibWFpbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9saWIvZG9tLnRzIiwiLi4vc3JjL2kxOG4udHMiLCIuLi9zcmMvbWFpbi50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0lBQUEsUUFBUTtJQUNSLFNBQWdCLGNBQWMsQ0FBRSxFQUFXO1FBQ3pDLE9BQU8sQ0FDTCxNQUFNLENBQUMsUUFBUSxDQUFDLGNBQWMsQ0FBQyxFQUFFLENBQUM7ZUFDN0IsQ0FBRSxDQUFDO2dCQUNKLE1BQU0sSUFBSSxLQUFLLENBQUMscUNBQW1DLEVBQUksQ0FBQyxDQUFDO1lBQzNELENBQUMsQ0FBQyxFQUFFLENBQUUsQ0FDVCxDQUFDO0lBQ0osQ0FBQztJQVBELHdDQU9DO0lBRUQsUUFBUTtJQUNSLFNBQ0Esc0JBQXNCLENBQUUsSUFBYTtRQUNuQyxPQUE0QyxDQUMxQyxNQUFNLENBQUMsUUFBUSxDQUFDLHNCQUFzQixDQUFDLElBQUksQ0FBQztlQUN2QyxDQUFFLENBQUM7Z0JBQ0osTUFBTSxJQUFJLEtBQUssQ0FBQyxnRUFBOEQsSUFBTSxDQUFDLENBQUM7WUFDeEYsQ0FBQyxDQUFDLEVBQUUsQ0FBRSxDQUNULENBQUM7SUFDSixDQUFDO0lBUkQsd0RBUUM7SUFFRCxRQUFRO0lBQ1IsU0FBZ0IsYUFBYSxDQUFFLElBQWE7UUFDMUMsT0FBOEIsQ0FDNUIsTUFBTSxDQUFDLFFBQVEsQ0FBQyxhQUFhLENBQUMsSUFBSSxDQUFDO2VBQzlCLENBQUU7Z0JBQ0gsTUFBTSxJQUFJLEtBQUssQ0FBQyw2QkFBNkIsR0FBRyxJQUFJLENBQUMsQ0FBQztZQUFDLENBQUMsQ0FBQyxDQUM5RCxDQUFDO0lBQ0osQ0FBQztJQU5ELHNDQU1DO0lBRUQsUUFBUTtJQUNSO1FBQStCLG9DQUFPO1FBQXRDOztRQU9BLENBQUM7UUFOQyxRQUFRO1FBQ0Qs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
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibWFpbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9saWIvZG9tLnRzIiwiLi4vc3JjL2xpYi90c2V4dC50cyIsIi4uL3NyYy9pMThuLnRzIiwiLi4vc3JjL21haW4udHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7SUFBQSxRQUFRO0lBQ1IsU0FBZ0IsY0FBYyxDQUFFLEVBQVc7UUFDekMsT0FBTyxDQUNMLE1BQU0sQ0FBQyxRQUFRLENBQUMsY0FBYyxDQUFDLEVBQUUsQ0FBQztlQUM3QixDQUFFLENBQUM7Z0JBQ0osTUFBTSxJQUFJLEtBQUssQ0FBQyxxQ0FBbUMsRUFBSSxDQUFDLENBQUM7WUFDM0QsQ0FBQyxDQUFDLEVBQUUsQ0FBRSxDQUNULENBQUM7SUFDSixDQUFDO0lBUEQsd0NBT0M7SUFFRCxRQUFRO0lBQ1IsU0FBZ0Isc0JBQXNCLENBQUUsSUFBYTtRQUNuRCxPQUFPLENBQ0wsTUFBTSxDQUFDLFFBQVEsQ0FBQyxzQkFBc0IsQ0FBQyxJQUFJLENBQUM7ZUFDdkMsQ0FBRSxDQUFDO2dCQUNKLE1BQU0sSUFBSSxLQUFLLENBQUMsZ0VBQThELElBQU0sQ0FBQyxDQUFDO1lBQ3hGLENBQUMsQ0FBQyxFQUFFLENBQUUsQ0FDVCxDQUFDO0lBQ0osQ0FBQztJQVBELHdEQU9DO0lBRUQsUUFBUTtJQUNSLFNBQWdCLGFBQWEsQ0FBRSxJQUFhO1FBQzFDLE9BQU8sQ0FDTCxNQUFNLENBQUMsUUFBUSxDQUFDLGFBQWEsQ0FBQyxJQUFJLENBQUM7ZUFDOUIsQ0FBRTtnQkFDSCxNQUFNLElBQUksS0FBSyxDQUFDLDZCQUE2QixHQUFHLElBQUksQ0FBQyxDQUFDO1lBQUMsQ0FBQyxDQUFDLENBQzlELENBQUM7SUFDSixDQUFDO0lBTkQsc0NBTUM7O0FBRUQ7Ozs7Ozs7Ozs7Ozs7OztFQWVFOzs7O0lDNUNG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

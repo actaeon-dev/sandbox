@@ -93,7 +93,7 @@
       "use-isnan": true,
 
 
-      "cyclomatic-complexity": [true, 10],
+      "cyclomatic-complexity": [true, 5], // broken
       "deprecation": true,
       "invalid-void": false, // wait for palantir/tslint#4839
       "max-classes-per-file": [true, 10, "exclude-class-expressions"],
@@ -115,7 +115,7 @@
 
       "array-type": [true, "array-simple"],
       "arrow-return-shorthand": [true, "multiline"],
-      "binary-expression-operand-order": true,
+      "binary-expression-operand-order": false,
       "callable-types": true,
       "class-name": true,
       "comment-format": [true, "check-space"],
