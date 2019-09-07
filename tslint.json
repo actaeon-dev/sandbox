@@ -93,7 +93,7 @@
       "use-isnan": true,
 
 
-      "cyclomatic-complexity": [true, 5], // broken
+      "cyclomatic-complexity": [true, 7],
       "deprecation": true,
       "invalid-void": false, // wait for palantir/tslint#4839
       "max-classes-per-file": [true, 10, "exclude-class-expressions"],

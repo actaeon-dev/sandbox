@@ -129,25 +129,43 @@ export class LocaleHandler {
   /** a */
   private readonly manifest : I18nManifest;
 
+  /** a */
+  private readonly cache : Map<string, Locale>;
+
   constructor (manifest : I18nManifest, dfault : Locale) {
+    if (undefined === manifest.available.get(dfault.id)) {
+      throw new Error("can't use an unknown locale: " + dfault.id);
+    }
+
     this.manifest = manifest;
     this.active = new LocaleState( dfault, dfault );
+
+    this.cache = new Map<string, Locale>().set(dfault.id, dfault);
   }
 
   /** what if we could write this as an unbound function without a state modification? */
   public async translate_page () : Promise<void> {
-    const new_locale = (<HTMLSelectElement> dom.getElementById(ID_I18N_SELECTION))
+    const new_locale_id = (<HTMLSelectElement> dom.getElementById(ID_I18N_SELECTION))
       .selectedOptions[0].getAttribute('name');
 
     if (
-      (null === new_locale)
-      || ( undefined === this.manifest.available.get(new_locale) )
+      (null === new_locale_id)
+      || ( undefined === this.manifest.available.get(new_locale_id) )
     ) { return; }
 
-    this.active = new LocaleState(
-      await load_locale_document(new_locale),
-      this.active.fallback, // ???? this.manifest.default ?
-    );
+    await (async () => {
+      const cache_val = this.cache.get(new_locale_id);
+      if (new_locale_id === this.active.current.id) {
+        // nothing needs to happen
+      } else if (undefined !== cache_val) {
+        this.active = new LocaleState(cache_val, this.active.fallback);
+      } else {
+        this.active = new LocaleState(
+          await load_locale_document(new_locale_id),
+          this.active.fallback,
+        );
+      }
+    })();
 
     console.log('translating page to', this.active);
     // const locale : LocaleState = get_locale_from_dom_state();

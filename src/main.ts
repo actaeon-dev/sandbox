@@ -1,3 +1,4 @@
+import * as game_manager from './game-manager';
 import * as i18n from './i18n';
 // import i18n = require('./i18n');
 import * as dom from './lib/dom';
@@ -13,26 +14,24 @@ function change_scroll_to_anchor () : void {
     .setAttribute('href', `#result-line${scrollpos}`);
 }
 
-/** debug */
+/* debug
 function see_keyboardevent (k : KeyboardEvent) : void {
   window.console.log(
     `${new Date()
         .getMilliseconds()
         .toString()} key: ${k.key} mod: ${k.getModifierState( k.key )}`);
 }
+*/
 
 /** create event listeners for page elements */
-async function make_listeners (lh : i18n.LocaleHandler) : Promise<void> {
-  const input_listeners : Array<[string, Function]> = [
-    ['keydown', see_keyboardevent],
-    ['keypress', see_keyboardevent],
-    ['keyup', see_keyboardevent],
-  ];
+async function
+make_listeners (lh : i18n.LocaleHandler, gm : game_manager.GameState) : Promise<void> {
+  const input_listeners : string[] = ['keydown', 'keypress', 'keyup'];
 
-  const primary : HTMLInputElement = <HTMLInputElement> dom.getElementById('primary');
+  const primary = <HTMLInputElement> dom.getElementById('primary');
 
   for (const l of input_listeners) {
-    primary.addEventListener(l[0], <EventListener> l[1]);
+    primary.addEventListener(l, <EventListener> gm.handle_keyboard.bind(gm));
   }
 
   dom.getElementById('scroll-input')
@@ -44,7 +43,7 @@ async function make_listeners (lh : i18n.LocaleHandler) : Promise<void> {
     .addEventListener('change', <EventListener> lh.translate_page.bind(lh));
 
   // window.console.log('finished make_listeners');
-  await new Promise(() => { /* */ });
+  return;
 }
 
 /** entry point */
@@ -55,7 +54,10 @@ async function main () : Promise<void> {
     manifest = await i18n.load_i18n_manifest(),
     dfault = await i18n.load_locale_document(manifest.default),
     locale_handler = new i18n.LocaleHandler(manifest, dfault),
-    listen = make_listeners(locale_handler);
+
+    gman = new game_manager.GameState(),
+
+    listen = make_listeners(locale_handler, gman);
 
   console.log(manifest);
 
