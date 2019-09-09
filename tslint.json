@@ -213,7 +213,7 @@
       ],
       "arrow-parens": true,
       "eofline": true,
-      "import-spacing": true,
+      "import-spacing": false,
       "indent": [true, "spaces", 2],
       "jsdoc-format": [true, "check-multiline-start"],
       "linebreak-style": [true, "LF"],

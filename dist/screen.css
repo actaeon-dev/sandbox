@@ -5,7 +5,7 @@ html,body{margin:0;padding:0;}
   display: grid;
   grid-template-columns: auto auto auto;
   grid-gap: 10px;
-  background-color: black;
+  background-color: #333;
   height: 100vh;
 }
 
@@ -13,9 +13,13 @@ html,body{margin:0;padding:0;}
   text-align: center;
   padding: 20px 0;
   font-size: 30px;
-  overflow: auto;
 
   color: white;
+}
+
+#message-ctr {
+  grid-column: 1;
+  grid-row: 2;
 }
 
 #result {
@@ -30,6 +34,7 @@ html,body{margin:0;padding:0;}
   box-shadow: -5px -5px #666;
 
   */
+  overflow: auto;
 
   grid-row-start: 1;
   grid-row-end: 3;
@@ -48,28 +53,36 @@ html,body{margin:0;padding:0;}
 }
 
 .result-line > i {
-  font-size: 12px;
-  line-height: .7;
+  font-size: 13px;
+  line-height: .6;
   padding-left: 4px;
 }
 
 .result-line-text {
-  font-size: 17px;
+  font-size: 18px;
   text-align: left;
   padding-left: 16px;
+  line-height: .8;
   /*
   margin: auto;*/
 }
 
-#page-controls {
+#prefs-top {
   grid-column: 3;
   grid-row: 1;
 }
 
-#game-controls {
-  font-size: 15px;
+#prefs-controls {
+  overflow: auto;
 
   grid-column: 3;
+  grid-row: 2;
+}
+
+#input-suggest {
+  overflow: auto;
+
+  grid-column: 1;
   grid-row: 3;
 }
 
@@ -80,8 +93,15 @@ html,body{margin:0;padding:0;}
   grid-row: 3;
 }
 
+#game-controls {
+  font-size: 15px;
+
+  grid-column: 3;
+  grid-row: 3;
+}
+
 a {
-  color: red;
+  color: rgba(255, 40, 255, 1);
 }
 
 #scroll-input {

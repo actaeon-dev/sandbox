@@ -1,9 +1,11 @@
-import * as dom from './lib/dom';
-import * as tsext from './lib/tsext';
+import * as dom from '../lib/dom';
+import * as tsext from '../lib/tsext';
 // import dom = require('./lib/dom');
 
 /** a */
 const DOCUMENT_PATH_TEMPLATE = 'data/i18n/%s.json';
+/** a */
+const DOCUMENT_LOCALE_PATH = 'locale/';
 /** a */
 export const ROOT_DOCUMENT = 'i18n';
 /** a */
@@ -246,7 +248,7 @@ export async function load_i18n_manifest () : Promise<I18nManifest> {
 
 /** a */
 export async function load_locale_document (id : string) : Promise<Locale> {
-  return _load_i18n_document(id)
+  return _load_i18n_document(DOCUMENT_LOCALE_PATH + id)
     .then( async (json : string) : Promise<Locale> => {
       const obj = <IntermediateLocale> JSON.parse(json);
       // console.log('intermediate locale: ', obj);

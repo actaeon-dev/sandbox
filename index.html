@@ -13,7 +13,16 @@
   <body>
     <div id="grid-root">
 
+      <div class="grid-item" id="header">
+        ???
+      </div>
+
+      <div class="grid-item" id="message-ctr">
+        messages<br />appear<br />here
+      </div>
+
       <div class="grid-item" id="result">
+
         <div id="result-sub">
           <div class="result-line" id="result-line0">
             <i>1.</i> <p class="result-line-text" id="result-line-text0">Some output.</p>
@@ -43,11 +52,27 @@
             <i>8.</i> <p class="result-line-text" id="result-line-text7">Next output.</p>
           </div>
         </div>
+
       </div>
 
-      <div class="grid-item" id="page-controls">
-        <select id="i18n-selection">
-        </select>
+      <div class="grid-item" id="prefs-top">
+
+        <a class="i18n-able" href="javascript:void(0);" id="prefs-visibility" data-i18n-id="page:prefs-visibility"></a>
+
+      </div>
+
+      <div class="grid-item" id="prefs-controls">
+        <div id="prefs-controls-sub">
+
+          <select id="i18n-selection">
+          </select>
+
+        </div>
+      </div>
+
+      <div class="grid-item" id="input-suggest">
+        input suggestions<br />
+        appear here
       </div>
 
       <div class="grid-item" id="stdin">

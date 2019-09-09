@@ -4,7 +4,8 @@
   "complete": true,
 
   "page": {
-    "scroll-to": "click to scroll to line:"
+    "scroll-to": "click to scroll to line:",
+    "prefs-visibility": "preferences ⏷"
   },
 
   "input_words": {

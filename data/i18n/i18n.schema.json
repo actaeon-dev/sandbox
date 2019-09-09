@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "data.i18n.i18n.schema.json",
+  "title": "i18n Root Manifest",
+  "description": "The I18N manifest describes all target locales available for translation.",
+  "type": "object",
+
+  "properties": {
+
+    "available": {
+      "description": "Maps all known locale ids to their self-localised proper names."
+      "type": "object",
+
+      "additionalProperties": {
+        "description": "Human-readable names."
+        "type": "string",
+        "pattern": "^.+ (.+)$"
+      },
+    },
+
+    "default": {
+      "description": "The starting locale to be used when the page loads, if a stored one is not present.",
+      "type": "string",
+      "pattern": "^\\[a-z]{2}-[A-Z]{2}$"
+    }
+  },
+
+  "required": ["available", "default"],
+
+  "additionalProperties": false
+}
