@@ -79,7 +79,8 @@
       "prefer-object-spread": true,
       "radix": true,
       "restrict-plus-operands": true,
-
+      "static-this": false,
+      "strict-boolean-expressions": false,
       "strict-comparisons": [true, "allow-string-order-comparison"],
       "strict-string-expressions": true,
       "strict-type-predicates": true,
@@ -95,7 +96,7 @@
 
       "cyclomatic-complexity": [true, 7],
       "deprecation": true,
-      "invalid-void": false, // wait for palantir/tslint#4839
+      "invalid-void": false,
       "max-classes-per-file": [true, 10, "exclude-class-expressions"],
       "max-file-line-count": [true, 1000],
       "no-default-export": true,

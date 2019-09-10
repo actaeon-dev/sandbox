@@ -1,29 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title> &gt;&gt;&gt; </title>
 
     <meta charset="utf-8"/>
 
-    <link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="dist/screen.css" />
-    <link rel="stylesheet" type="text/css" charset="utf-8" media="print" href="dist/print.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="dist/screen.css" />
+    <link rel="stylesheet" type="text/css" media="print" href="dist/print.css" />
 
-    <script async data-main="dist/main" src="dist/require.js" type="text/javascript" charset="utf-8" > </script>
+    <script async data-main="dist/main" src="dist/require.js" > </script>
   </head>
   <body>
     <div id="grid-root">
 
-      <div class="grid-item" id="header">
-        ???
+      <div class="grid-item" id="cell-header-cell">
+        <header>
+           <h1 class="i18n-able" data-i18n-id="page:header"></h1>
+        </header>
       </div>
 
-      <div class="grid-item" id="message-ctr">
-        messages<br />appear<br />here
+      <div class="grid-item" id="cell-log" role="complementary">
+        event logs<br />appear<br />here
       </div>
 
-      <div class="grid-item" id="result">
+      <div class="grid-item" id="cell-result">
 
-        <div id="result-sub">
+        <div id="result-sub"  role="main">
           <div class="result-line" id="result-line0">
             <i>1.</i> <p class="result-line-text" id="result-line-text0">Some output.</p>
           </div>
@@ -55,32 +57,64 @@
 
       </div>
 
-      <div class="grid-item" id="prefs-top">
+      <div class="grid-item" id="cell-prefs-top">
 
         <a class="i18n-able" href="javascript:void(0);" id="prefs-visibility" data-i18n-id="page:prefs-visibility"></a>
 
       </div>
 
-      <div class="grid-item" id="prefs-controls">
+      <div class="grid-item" id="cell-prefs-controls" role="form">
         <div id="prefs-controls-sub">
 
-          <select id="i18n-selection">
-          </select>
+          <div class="one-pref">
+            <label class="i18n-able" data-i18n-id="page:prefs-i18n-label"></label>
+
+            <select id="i18n-selection"> </select>
+          </div>
+
+          <div class="one-pref">
+            <label class="i18n-able" data-i18n-id="page:prefs-telemetry-label"></label>
+
+            <input type="checkbox" id="prefs-telemetry" />
+          </div>
+
+          <div class="one-pref">
+            <label class="i18n-able" data-i18n-id="page:prefs-use-localstorage-label"></label>
+
+            <input type="checkbox" id="prefs-use-localstorage"/>
+          </div>
+
+          <div class="one-pref prefs-bottom">
+            <a class="i18n-able" href="javascript:void(0);" id="prefs-save" data-i18n-id="page:prefs-save"></a>
+
+            <a class="i18n-able" href="javascript:void(0);" id="prefs-reset" data-i18n-id="page:prefs-reset"></a>
+          </div>
 
         </div>
       </div>
 
-      <div class="grid-item" id="input-suggest">
+      <div class="grid-item" id="cell-input-suggest" role="application" aria-label="game input phrase suggestion">
         input suggestions<br />
         appear here
       </div>
 
-      <div class="grid-item" id="stdin">
-        <input type="text" id="primary" autofocus autocomplete="on" placeholder="?">
+      <div class="grid-item" id="cell-stdin" role="form">
+
+        <label class="i18n-able" id="stdin-label" data-i18n-id="page:stdin-label"></label>
+
+        <input type="text" id="stdin" autofocus autocomplete="on" placeholder="?" role="application" aria-label="game input control" />
+
       </div>
 
-      <div class="grid-item" id="game-controls">
-        <a class="i18n-able" href="#result-line0" id="scroll-to" data-i18n-id="page:scroll-to"></a> <input type="number" id="scroll-input" placeholder="1" min="1">
+      <div class="grid-item" id="cell-game-controls" role="navigation" aria-label="scrolling navigation">
+
+        <a class="i18n-able" href="#result-line0" id="scroll-to" data-i18n-id="page:scroll-to"></a>
+
+        <input type="number" id="scroll-input" placeholder="1" min="1" aria-labelledby="scroll-to">
+      </div>
+
+      <div class="grid-item" id="cell-info">
+        <footer class="about" id="about-section"></footer>
       </div>
 
     </div>

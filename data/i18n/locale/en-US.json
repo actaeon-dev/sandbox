@@ -4,14 +4,23 @@
   "complete": true,
 
   "page": {
-    "scroll-to": "click to scroll to line:",
-    "prefs-visibility": "preferences ⏷"
+    "header": "sandbox",
+    "prefs-visibility": "preferences ⏷",
+    "prefs-i18n-label": "content language",
+    "prefs-telemetry-label": "send anonymous input/usage data to help development",
+    "prefs-use-localstorage-label": "save to localStorage?",
+    "prefs-save": "save",
+    "prefs-reset": "reset",
+    "stdin-label": "input something",
+    "scroll-to": "click to scroll to line:"
+
   },
 
   "input_words": {
     "a1": "take",
     "b2": "put",
-    "c3": "open"
+    "c3": "open",
+    "d4": "hello"
   },
 
   "output": {

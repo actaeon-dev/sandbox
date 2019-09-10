@@ -1,9 +1,17 @@
 html,body{margin:0;padding:0;}
 /*h1,p{margin:0 0 1em}*/
 
+a {
+  color: rgb(255, 40, 255);
+}
+
+h1 { font-size: 40px; }
+
 #grid-root {
   display: grid;
-  grid-template-columns: auto auto auto;
+  /* grid-template-columns: auto auto auto; */
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
   grid-gap: 10px;
   background-color: #333;
   height: 100vh;
@@ -14,15 +22,15 @@ html,body{margin:0;padding:0;}
   padding: 20px 0;
   font-size: 30px;
 
-  color: white;
+  color: #eee;
 }
 
-#message-ctr {
+#cell-log {
   grid-column: 1;
   grid-row: 2;
 }
 
-#result {
+#cell-result {
 /*  width: 50vw;
   height: 10vh;
   text-align: center;
@@ -67,44 +75,61 @@ html,body{margin:0;padding:0;}
   margin: auto;*/
 }
 
-#prefs-top {
+#cell-prefs-top {
   grid-column: 3;
   grid-row: 1;
 }
 
-#prefs-controls {
+#cell-prefs-controls {
   overflow: auto;
 
   grid-column: 3;
   grid-row: 2;
+
+  font-size: 16px;
+
+  display: inherit;
 }
 
-#input-suggest {
+.one-pref {
+  display: inline;
+}
+.prefs-bottom {}
+
+#cell-input-suggest {
   overflow: auto;
 
   grid-column: 1;
   grid-row: 3;
 }
 
-#stdin {
+#cell-stdin {
   font-size: 17px;
 
   grid-column: 2;
   grid-row: 3;
+
+  display: inherit;
+  text-align: center;
 }
 
-#game-controls {
+#stdin {
+  width: 40%;
+}
+
+#cell-game-controls {
   font-size: 15px;
 
   grid-column: 3;
   grid-row: 3;
 }
 
-a {
-  color: rgba(255, 40, 255, 1);
-}
-
 #scroll-input {
   width: 40px;
   height: 10px;
+}
+
+#cell-info {
+  grid-column: 1;
+  grid-row: 4;
 }
