@@ -86,7 +86,7 @@ h1 { font-size: 40px; }
   grid-column: 3;
   grid-row: 2;
 
-  font-size: 16px;
+  font-size: 14px;
 
   display: inherit;
 }
@@ -115,6 +115,7 @@ h1 { font-size: 40px; }
 
 #stdin {
   width: 40%;
+  height: 30%;
 }
 
 #cell-game-controls {
@@ -126,7 +127,6 @@ h1 { font-size: 40px; }
 
 #scroll-input {
   width: 40px;
-  height: 10px;
 }
 
 #cell-info {

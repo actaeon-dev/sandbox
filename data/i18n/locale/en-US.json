@@ -7,7 +7,7 @@
     "header": "sandbox",
     "prefs-visibility": "preferences ⏷",
     "prefs-i18n-label": "content language",
-    "prefs-telemetry-label": "send anonymous input/usage data to help development",
+    "prefs-telemetry-label": "send anonymous usage data for development",
     "prefs-use-localstorage-label": "save to localStorage?",
     "prefs-save": "save",
     "prefs-reset": "reset",
@@ -20,7 +20,8 @@
     "a1": "take",
     "b2": "put",
     "c3": "open",
-    "d4": "hello"
+    "d4": "hello",
+    "d4": "approach"
   },
 
   "output": {
