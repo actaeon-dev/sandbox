@@ -16,17 +16,8 @@ function change_scroll_to_anchor (e : InputEvent) : void {
 
 /** create event listeners for page elements */
 async function
-make_listeners (lh : i18n.LocaleHandler, gm : game_manager.GameState) : Promise<void> {
+make_listeners (lh : i18n.LocaleHandler) : Promise<void> {
     // TODO: move to GameState
-  (() => {
-    const input_listeners : string[] = ['keydown', 'keypress', 'keyup'];
-
-    const stdin = <HTMLInputElement> dom.getElementById('stdin');
-
-    for (const l of input_listeners) {
-      stdin.addEventListener(l, <EventListener> gm.handle_keyboard.bind(gm));
-    }
-  })();
 
   dom.getElementById('scroll-input')
     .addEventListener('change', <EventListener> change_scroll_to_anchor);
@@ -37,19 +28,6 @@ make_listeners (lh : i18n.LocaleHandler, gm : game_manager.GameState) : Promise<
     //   NOT the LocaleHandler typename
     .addEventListener('change', <EventListener> lh.translate_page.bind(lh));
 
-  (() => {
-    // first-time set-up
-    dom.getElementById('prefs-controls-sub').style.display = 'none';
-
-    dom.getElementById('prefs-visibility')
-      .addEventListener('click', <EventListener> ((e : MouseEvent) => {
-        e.preventDefault();
-        const s = dom.getElementById('prefs-controls-sub');
-        s.style.display = (s.style.display === 'none')
-          ? 'inherit'
-          : 'none';
-      }));
-  })();
 
   // window.console.log('finished make_listeners');
   return;
@@ -67,11 +45,15 @@ async function main () : Promise<void> {
 
     gman = new game_manager.GameState(),
 
-    listen = make_listeners(locale_handler, gman);
+    listen = make_listeners(locale_handler),
+    glisten = gman.make_listeners(),
+    plisten = cfg.make_listeners();
 
   console.log(manifest);
 
   await listen;
+  await glisten;
+  await plisten;
 
   await locale_handler.populate_locale_selection();
 

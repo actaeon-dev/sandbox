@@ -11,6 +11,18 @@ export class GameState {
     this.last_kb_evt = new KeyboardEvent('');
   }
 */
+  public async make_listeners () : Promise<void> {
+    const input_listeners : string[] = ['keydown', 'keypress', 'keyup'];
+
+    const stdin = <HTMLInputElement> dom.getElementById('stdin');
+
+    for (const l of input_listeners) {
+      stdin.addEventListener(l, <EventListener> this.handle_keyboard.bind(this));
+    }
+
+    return;
+  }
+
   /** a */
   public handle_keyboard (kbe : KeyboardEvent) : void {
     // console.log('previous last evt: ', this.last_kb_evt);

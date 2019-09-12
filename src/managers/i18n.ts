@@ -215,12 +215,15 @@ export class LocaleHandler {
 }
 
 /** a */
+type PrimitiveStringDict = { [id : string] : string };
+
+/** a */
 function _make_gtt (igtt : IntermediateGameTranslationTarget) : GameTranslationTarget {
 
   return ({
-    noun: tsext.map_from_object<string>(igtt.noun),
-    dialogue: tsext.map_from_object<string>(igtt.dialogue),
-    description: tsext.map_from_object<string>(igtt.description),
+    noun: tsext.map_from_object<PrimitiveStringDict, string>(igtt.noun),
+    dialogue: tsext.map_from_object<PrimitiveStringDict, string>(igtt.dialogue),
+    description: tsext.map_from_object<PrimitiveStringDict, string>(igtt.description),
   });
 }
 
@@ -239,7 +242,7 @@ export async function load_i18n_manifest () : Promise<I18nManifest> {
       // console.log('intermediate manifest: ', obj);
 
       return ({
-        available: tsext.map_from_object<string>(obj.available),
+        available: tsext.map_from_object<PrimitiveStringDict, string>(obj.available),
 
         default: obj.default,
       });
@@ -256,10 +259,10 @@ export async function load_locale_document (id : string) : Promise<Locale> {
       return ({
         complete: obj.complete,
         id: obj.id,
-        input_words: tsext.map_from_object<string>(obj.input_words),
+        input_words: tsext.map_from_object<PrimitiveStringDict, string>(obj.input_words),
         name: obj.name,
         output: _make_gtt( <IntermediateGameTranslationTarget> obj.output),
-        page: tsext.map_from_object<string>(obj.page),
+        page: tsext.map_from_object<PrimitiveStringDict, string>(obj.page),
       });
     });
 }

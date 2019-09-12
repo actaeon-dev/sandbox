@@ -13,7 +13,7 @@ export function object_entries<rhs> (obj : { }) : Array<[string, rhs]> {
 }
 
 /** a */
-function _native_map_from_object <B> (obj : { }) : Map<string, B> {
+function _native_map_from_object <A, B> (obj : A) : Map<string, B> {
 
   return new Map<string, B>(
     <Array<[string, B]>> ( <Function> Reflect.get(Object, 'entries') )(obj),
@@ -21,7 +21,7 @@ function _native_map_from_object <B> (obj : { }) : Map<string, B> {
 }
 
 /** a */
-function _impl_map_from_object <B> (obj : { }) : Map<string, B> {
+function _impl_map_from_object <A, B> (obj : A) : Map<string, B> {
 
   return new Map<string, B>( object_entries<B>(obj) );
 }
