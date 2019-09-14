@@ -11,6 +11,12 @@ const enum PrefsAction {
   EXPORT = 'export',
 }
 
+const enum PrefsItem {
+  TELEMETRY = 'telemetry',
+  I18N = 'i18n',
+  USE_LOCALSTORAGE = 'use-localstorage',
+}
+
 /** a */
 export class Preferences {
 
@@ -71,16 +77,11 @@ export class Preferences {
   /*** require confirmation */
   public async state_change ( action : PrefsAction ) : Promise<void> {
 
-    const new_locale_id = (<HTMLSelectElement> dom.getElementById('prefs-i18n'))
-      .selectedOptions[0].getAttribute('name');
+    // const new_locale_id = (<HTMLSelectElement> dom.getElementById('prefs-i18n'))
+    //   .selectedOptions[0].getAttribute('name');
 
-    return (({
+    return new tsext.Dict<( () => void ) >({
 
-      [PrefsAction.SAVE]: (() : string => { 'a' }),
-      [PrefsAction.RESET]: (() : string => { 'b' ),
-      [PrefsAction.IMPORT]: (() : string  => { 'c' }),
-      [PrefsAction.EXPORT]: (() : string => { 'd' }),
-
-    })[action])();
+    })[action]();
   }
 }
