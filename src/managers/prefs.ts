@@ -1,12 +1,18 @@
 // you will write localstorage with 'prefs:' namespace
 
-import * as dom   from '../lib/dom';
+import * as dom   from '../lib/dom/interact';
 import * as tsext from '../lib/tsext';
 
 /** a */
+const enum PrefsAction {
+  SAVE = 'save',
+  RESET = 'reset',
+  IMPORT = 'import',
+  EXPORT = 'export',
+}
+
+/** a */
 export class Preferences {
-
-
 
   constructor () {
     dom.getElementById('prefs-controls-sub').style.display = 'none';
@@ -16,41 +22,43 @@ export class Preferences {
   public async make_listeners () : Promise<void> {
     // first-time set-up
 
-    const click  = 'click';
+    const cl  = 'click';
 
-    const listeners : Map<string, [string, EventListener]> = tsext.map_from_object<
-      { [id : string] : [string, Function] },
-      [string, EventListener]
-    >({
+    const make_sf = ((action : PrefsAction) => (
+      async (e : MouseEvent) => {
+        e.preventDefault();
 
-        'prefs-reset': [click, ( async (e : MouseEvent) => {
-          e.preventDefault();
+        return this.state_change(action);
+      })
+    );
 
-          await this.reset_prefs_dom_state();
-        } )],
+    const listeners : Map<string, [string, EventListener]>
+      = tsext.map_from_object<
+        { [key : string] : [string, Function] }, [string, EventListener]>
+    ({
+        'prefs-export': [cl, make_sf(PrefsAction.EXPORT)],
+        'prefs-import': [cl, make_sf(PrefsAction.IMPORT)],
+        'prefs-reset': [cl, make_sf(PrefsAction.RESET)],
+        'prefs-save':  [cl, make_sf(PrefsAction.SAVE)],
 
-        'prefs-save': [click, ( async (e : MouseEvent) => {
-          e.preventDefault();
+        // 'prefs-i18n': [click, ]
 
-          await this.write_prefs_dom_state();
-        } )],
-
-        'prefs-telemetry': [click, ( (_ : MouseEvent) => {
+        'prefs-telemetry': [cl, ( (_ : MouseEvent) => {
           // show alert?
         } )],
 
-        'prefs-use-localstorage': [click, ( (_ : MouseEvent) => {
+        'prefs-use-localstorage': [cl, ( (_ : MouseEvent) => {
           // show alert?
         } )],
 
-        'prefs-visibility': [click, ( (e : MouseEvent) => {
+        'prefs-visibility': [cl, ( (e : MouseEvent) => {
           e.preventDefault();
           const s = dom.getElementById('prefs-controls-sub');
           s.style.display = (s.style.display === 'none')
             ? 'inherit'
             : 'none';
         } )],
-      });
+    });
 
     listeners.forEach( ((v : [string, EventListener], k : string, _) : void => {
       dom.getElementById(k)
@@ -61,8 +69,18 @@ export class Preferences {
   }
 
   /*** require confirmation */
-  public async reset_prefs_dom_state () : Promise<void> { return; }
-  /** a */
-  public async write_prefs_dom_state () : Promise<void> { return; }
-  // a
+  public async state_change ( action : PrefsAction ) : Promise<void> {
+
+    const new_locale_id = (<HTMLSelectElement> dom.getElementById('prefs-i18n'))
+      .selectedOptions[0].getAttribute('name');
+
+    return (({
+
+      [PrefsAction.SAVE]: (() : string => { 'a' }),
+      [PrefsAction.RESET]: (() : string => { 'b' ),
+      [PrefsAction.IMPORT]: (() : string  => { 'c' }),
+      [PrefsAction.EXPORT]: (() : string => { 'd' }),
+
+    })[action])();
+  }
 }

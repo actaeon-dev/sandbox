@@ -1,4 +1,4 @@
-import * as dom from '../lib/dom';
+import * as dom from '../lib/dom/interact';
 // you will write localstorage with 'game:' namespace
 
 /** need to be able to save/load states, from client or server */

@@ -1,5 +1,6 @@
-import * as dom from '../lib/dom';
-import * as tsext from '../lib/tsext';
+import * as construct from '../lib/dom/construct';
+import * as dom       from '../lib/dom/interact';
+import * as tsext     from '../lib/tsext';
 // import dom = require('./lib/dom');
 
 /** a */
@@ -13,14 +14,14 @@ const CLASS_TRANSLATABLE = 'i18n-able';
 /** a */
 const SPECIAL_DATA_ID = 'data-i18n-id';
 /** a */
-const ID_I18N_SELECTION = 'i18n-selection';
+// const ID_I18N_SELECTION = 'i18n-selection';
 /** a */
 const MISSING_TRANSLATION = '(missing translation)';
 /** a */
 const FORMAT_REPLACE = '%s';
 
 /** a */
-type TranslateFieldName = 'page' | 'input_words';
+type TranslateFieldName = 'page';
 
 /** manifest structure directly from JSON, before unmangling object -> Map etc */
 /* private */
@@ -28,14 +29,17 @@ interface IntermediateI18nManifest {
   /** The default locale, for initialisation and fallback purposes. */
   readonly default   : string;
   /** stub for the map of available locale ids to their names */
-  readonly available : { };
+  readonly available : tsext.DictOfString;
 }
 
 /**
  * Locale-describer
  */
-export interface I18nManifest extends IntermediateI18nManifest {
+export interface I18nManifest {
+  /** The default locale, for initialisation and fallback purposes. */
+  readonly default   : string;
   /** Available locale ids to names, not the total list of files in data/i18n */
+  // could become a map2d later to allow searching
   readonly available : Map<string, string>;
 }
 
@@ -43,20 +47,20 @@ export interface I18nManifest extends IntermediateI18nManifest {
 /* private */
 interface IntermediateGameTranslationTarget {
   /** simple object names */
-  readonly noun : { };
+  readonly noun : tsext.DictOfString;
   /** speech, including narration */
-  readonly dialogue : { };
+  readonly dialogue : tsext.DictOfString;
   /** descriptions of items, places, emotions, etc */
-  readonly description : { };
+  readonly description : tsext.DictOfString;
 }
 /** all properties map UIDs to their natural language content */
-interface GameTranslationTarget extends IntermediateGameTranslationTarget {
+interface GameTranslationTarget /* extends IntermediateGameTranslationTarget */ {
   /** simple object names */
-  readonly noun : Map<string, string>;
+  readonly noun : tsext.Map2DOfString;
   /** speech, including narration */
-  readonly dialogue : Map<string, string>;
+  readonly dialogue : tsext.Map2DOfString;
   /** descriptions of items, places, emotions, etc */
-  readonly description : Map<string, string>;
+  readonly description : tsext.Map2DOfString;
 }
 
 /** locale structure directly from JSON, before complex types are unmangled from object */
@@ -69,18 +73,24 @@ interface IntermediateLocale {
   /** whether the translation is "total" */
   readonly complete : boolean;
   /** stub */
-  readonly page : { };
+  readonly page : tsext.DictOfString;
   /** stub */
-  readonly input_words : { };
+  readonly input_words : tsext.DictOfString;
   /** stub */
-  readonly output : { };
+  readonly output : IntermediateGameTranslationTarget;
 }
 /** A translation target. */
-interface Locale extends IntermediateLocale {
+interface Locale /* extends IntermediateLocale */ {
+  /** human readable name */
+  readonly name : string;
+  /** ISO 639 */
+  readonly id : string;
+  /** whether the translation is "total" */
+  readonly complete : boolean;
   /** map from HTML data-* ids to what text should be inside them */
-  readonly page : Map<string, string>;
+  readonly page : tsext.Map2DOfString;
   /** user-input commands */
-  readonly input_words : Map<string, string>;
+  readonly input_words : tsext.Map2DOfString;
   /** actual game content */
   readonly output : GameTranslationTarget;
 }
@@ -125,13 +135,13 @@ class LocaleState {
 /** non-data class handling current page locale */
 export class LocaleHandler {
 
-  /** a */
+  /** mutable current and fallback locales for the page and game to use */
   private /* readonly */ active : LocaleState;
 
-  /** a */
+  /** root document, only loaded once */
   private readonly manifest : I18nManifest;
 
-  /** a */
+  /** history of loaded locales, to prevent replays */
   private readonly cache : Map<string, Locale>;
 
   constructor (manifest : I18nManifest, dfault : Locale) {
@@ -145,30 +155,15 @@ export class LocaleHandler {
     this.cache = new Map<string, Locale>().set(dfault.id, dfault);
   }
 
-  /** what if we could write this as an unbound function without a state modification? */
-  public async translate_page () : Promise<void> {
-    const new_locale_id = (<HTMLSelectElement> dom.getElementById(ID_I18N_SELECTION))
-      .selectedOptions[0].getAttribute('name');
-
+  /**
+   * what if we could write this as an unbound function without a state modification?
+   * populate all class=translatable nodes given their data-i18n-id value
+   */
+  public async translate_page (new_locale_id : string) : Promise<void> {
     if (
-      (null === new_locale_id)
-      || ( undefined === this.manifest.available.get(new_locale_id) )
+      //(null === new_locale_id)
+      undefined === this.manifest.available.get(new_locale_id)
     ) { return; }
-
-    // avoid scope pollution
-    await (async () => {
-      const cache_val = this.cache.get(new_locale_id);
-      if (new_locale_id === this.active.current.id) {
-        // nothing needs to happen
-      } else if (undefined !== cache_val) {
-        this.active = new LocaleState(cache_val, this.active.fallback);
-      } else {
-        this.active = new LocaleState(
-          await load_locale_document(new_locale_id),
-          this.active.fallback,
-        );
-      }
-    })();
 
     console.log('translating page to', this.active);
     // const locale : LocaleState = get_locale_from_dom_state();
@@ -176,6 +171,8 @@ export class LocaleHandler {
       dom.getElementsByClassName(CLASS_TRANSLATABLE) );
 
     const max_split = 2;
+
+    await this._do_cache(new_locale_id);
 
     for (const c of candidates) {
 
@@ -190,7 +187,6 @@ export class LocaleHandler {
         c.innerText = this.active.get_id(...parts);
       }
     }
-    // populate all class=translatable nodes given their data-i18n-id value
   }
 
   /** a */
@@ -199,11 +195,12 @@ export class LocaleHandler {
 
     const i18n_selection = dom.getElementById(ID_I18N_SELECTION);
 
-    for (const { '0': id, '1': human_str } of this.manifest.available) {
+    for (const [id, human_str] of this.manifest.available) {
 
-      const option = dom.createElement('option');
-      option.setAttribute('id', 'locale-' + id);
-      option.setAttribute('name', id);
+      const option = construct.element('option', {
+        id: 'locale-' + id,
+        name: id,
+      });
 
       option.appendChild( window.document.createTextNode( human_str ) );
 
@@ -212,18 +209,30 @@ export class LocaleHandler {
 
     return;
   }
-}
 
-/** a */
-type PrimitiveStringDict = { [id : string] : string };
+  /** a */
+  private async _do_cache (new_locale_id : string) : Promise<void> {
+    const cache_val = this.cache.get(new_locale_id);
+    if (new_locale_id === this.active.current.id) {
+      // nothing needs to happen
+    } else if (undefined !== cache_val) {
+      this.active = new LocaleState(cache_val, this.active.fallback);
+    } else {
+      this.active = new LocaleState(
+        await load_locale_document(new_locale_id),
+        this.active.fallback,
+      );
+    }
+  }
+}
 
 /** a */
 function _make_gtt (igtt : IntermediateGameTranslationTarget) : GameTranslationTarget {
 
   return ({
-    noun: tsext.map_from_object<PrimitiveStringDict, string>(igtt.noun),
-    dialogue: tsext.map_from_object<PrimitiveStringDict, string>(igtt.dialogue),
-    description: tsext.map_from_object<PrimitiveStringDict, string>(igtt.description),
+    noun: tsext.map_from_object<tsext.DictOfString, string>(igtt.noun),
+    dialogue: tsext.map_from_object<tsext.DictOfString, string>(igtt.dialogue),
+    description: tsext.map_from_object<tsext.DictOfString, string>(igtt.description),
   });
 }
 
@@ -242,7 +251,8 @@ export async function load_i18n_manifest () : Promise<I18nManifest> {
       // console.log('intermediate manifest: ', obj);
 
       return ({
-        available: tsext.map_from_object<PrimitiveStringDict, string>(obj.available),
+        available: tsext.map_from_object<tsext.DictOfString, string>(
+          obj.available),
 
         default: obj.default,
       });
@@ -259,10 +269,11 @@ export async function load_locale_document (id : string) : Promise<Locale> {
       return ({
         complete: obj.complete,
         id: obj.id,
-        input_words: tsext.map_from_object<PrimitiveStringDict, string>(obj.input_words),
+        input_words: tsext.map_from_object<
+          tsext.DictOfString, string>(obj.input_words),
         name: obj.name,
-        output: _make_gtt( <IntermediateGameTranslationTarget> obj.output),
-        page: tsext.map_from_object<PrimitiveStringDict, string>(obj.page),
+        output: _make_gtt(obj.output),
+        page: tsext.map_from_object<tsext.DictOfString, string>(obj.page),
       });
     });
 }

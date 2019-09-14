@@ -1,4 +1,4 @@
-import * as dom           from './lib/dom';
+import * as dom           from './lib/dom/interact';
 import * as game_manager  from './managers/game';
 import * as i18n          from './managers/i18n';
 import * as prefs         from './managers/prefs';

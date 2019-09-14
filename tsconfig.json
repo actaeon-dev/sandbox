@@ -30,17 +30,22 @@
 
     "locale": "en-us",
 
-    "lib": [ "dom", "es2015" ],
+    "lib": [ "dom", "es2015", "es2017.object" ],
     "preserveWatchOutput": true,
 
     "traceResolution": false,
     "listEmittedFiles": true,
     "listFiles": true,
-    "pretty": true
+    "pretty": true,
+
+    "typeRoots": [
+      "src/**"
+    ]
   },
 
   "include": [
     "src/**/*.ts"
   ],
+
   "compileOnSave": true
 }
