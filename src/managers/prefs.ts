@@ -75,13 +75,15 @@ export class Preferences {
   }
 
   /*** require confirmation */
-  public async state_change ( action : PrefsAction ) : Promise<void> {
+  public async state_change ( action : PrefsAction ) : Promise<number> {
 
     // const new_locale_id = (<HTMLSelectElement> dom.getElementById('prefs-i18n'))
     //   .selectedOptions[0].getAttribute('name');
 
-    return new tsext.Dict<( () => void ) >({
+    const rs : tsext.Dict<( () => number ) > = {
 
-    })[action]();
+    };
+
+    return rs[action]();
   }
 }

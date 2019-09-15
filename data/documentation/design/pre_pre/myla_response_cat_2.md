@@ -24,4 +24,6 @@ Pt. 3
 > I hope this answers all the questions and if you have any more lmk.
 > I'm still grappling with how to articulate questions i have about state machines and how to connect that properly to timers, world clocks, or what have you. (Ambition is crazy cause its like, oh hey this is probably not that hard you can cut it back to make it less hard and then it just spirals. Its so fun. Actually fun i mean, not like fun where im being violently sarcastic)
 
-"method of conveying this description" just means the way that the game world demonstrates and presents itself to [...]
+"method of conveying this description" as in the way that the game world demonstrates and presents itself to the player.
+
+"open to definition by us" as in, we don't have to follow trends of the 80s/90s text-adventures or modern story-driven RPGs or modern text-adventures. We can build an entirely new metaphor from scratch.
