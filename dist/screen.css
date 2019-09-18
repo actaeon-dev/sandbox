@@ -7,6 +7,19 @@ a {
 
 h1 { font-size: 40px; }
 
+input, textarea, select, button {
+  width : 50%;
+  margin: 0;
+
+  font-family : inherit;
+  font-size   : 100%;
+
+  -webkit-box-sizing: border-box; /* For legacy WebKit based browsers */
+     -moz-box-sizing: border-box; /* For legacy (Firefox <29) Gecko based browsers */
+          box-sizing: border-box;
+
+}
+
 #grid-root {
   display: grid;
   /* grid-template-columns: auto auto auto; */
@@ -25,7 +38,7 @@ h1 { font-size: 40px; }
   color: #eee;
 }
 
-#cell-log {
+#cell-stat-left {
   grid-column: 1;
   grid-row: 2;
 }
@@ -48,7 +61,7 @@ h1 { font-size: 40px; }
   grid-row-end: 3;
 
   grid-column-start: 2;
-  grid-column-end: 3;
+  grid-column-end: 4;
 }
 
 #result-sub {
@@ -76,14 +89,14 @@ h1 { font-size: 40px; }
 }
 
 #cell-prefs-top {
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 1;
 }
 
 #cell-prefs-controls {
   overflow: auto;
 
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 2;
 
   font-size: 14px;
@@ -106,7 +119,9 @@ h1 { font-size: 40px; }
 #cell-stdin {
   font-size: 17px;
 
-  grid-column: 2;
+  grid-column-start: 2;
+  grid-column-end: 4;
+
   grid-row: 3;
 
   display: inherit;
@@ -114,14 +129,21 @@ h1 { font-size: 40px; }
 }
 
 #stdin {
-  width: 40%;
-  height: 30%;
+  border: none;
+  border-radius: 20px;
+  background-color: #bbb;
+
+  font-family: monospace;
+  font-weight: bold;
+  width: 100%;
+
+  -webkit-appearance: none;
 }
 
 #cell-game-controls {
   font-size: 15px;
 
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 3;
 }
 

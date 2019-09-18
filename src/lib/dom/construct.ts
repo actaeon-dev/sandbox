@@ -2,7 +2,7 @@ import * as tsext from '../tsext';
 
 import * as dom from './interact';
 /** a */
-type ElementKind = 'option';
+type ElementKind = 'option' | 'div';
 /** a */
 export function
 element (kind : ElementKind, attrs : { [ key : string ] : string }) : Element {

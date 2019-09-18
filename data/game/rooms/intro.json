@@ -1,0 +1,68 @@
+{
+  "interior": true, # whether there are walls
+  "default": {      # can be overridden
+    "shape": "rectangular_prism",
+    "size": {
+      "anchor": 1,  # which corner to anchor on, 1-4 clockwise from top right or 0 for center
+      "origin": 1,  # where the origin for sub-positioning is, same as previous
+      "w": 2,       # 4th dimension
+      "x": 8,       # width
+      "y": 10,      # length
+      "z": 3        # height
+    },
+
+    "objects": [
+      {
+        "id": "bed", # frame, box spring and mattress
+        "position": { # offset from origin, by default
+          "w": -0.5,
+          "x": -1,
+          "y": -1,
+          # z is omitted for 0
+        },
+        # bed's default subobjects contain sheets, pillow etc
+      },
+
+      {
+        "id": "table",
+        "position": {
+          "origin": 0
+          # rest 0
+        },
+        "scale": 6,
+        "attributes": {
+          "condition": [ "old", "dusty" ],
+          "materials": { "hardwood": 100 } # not default
+          # short form: "material": "hardwood" or "materials": [ "hardwood" ]
+        },
+        "objects": [
+          {
+            "id": "candleholder",
+            "objects": {
+              "id": "candle",
+              "attributes": {
+                "wick_burning": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+
+    "edge_counts": { # min/max connectable rooms
+      "min": 1,
+      "max": 2
+    },
+
+    "ambient": {
+      "atmosphere": "air",
+      "condition": "standard"
+    },
+
+    "attributes": {
+      "flammable": true,
+      "material": "wood"
+    }
+  }
+
+}

@@ -92,10 +92,10 @@ export class Map2D <A, B> {
 export type Map2DOfString = Map2D<string, string>;
 
 /** a */
-export type Dict<T> {
+export type Dict<T> = {
   [key : string] : T;
   [key : number] : T;
-}
+};
 
 /** a */
 export type DictOfString = Dict<string>;
