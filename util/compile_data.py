@@ -2,31 +2,31 @@
 try:
     import ujson as json
 except ImportError:
-    import json
-import os
+    import json  # type: ignore mypy bug
+from pathlib import Path
 import re
 import sys
-import typing
+from typing import (Callable, Union, Dict, List,
+                    Iterable, Mapping, Optional, cast)
 
-import fastjsonschema
+import fastjsonschema  # type: ignore
 
 
 class Constants:
 
-    class Ext:
-        JSON = ".json"
-        SCHEMA = ".schema" + JSON
+    class Paths:
+        _my_dir_abs = Path(__file__).parent.resolve()
+        _up_dir_abs = _my_dir_abs.parent
+        D_GAME = _up_dir_abs / "data" / "game"
+        D_DIST = _up_dir_abs / "dist" / "data"
+        D_INTERMEDIATE = Path("ir")
 
-    class Data:
-        _up_dir = os.path.join(os.path.dirname(__file__), "..")
-        GAME = os.path.join(_up_dir, "data", "game")
-        DIST = os.path.join(_up_dir, "dist", "data")
-        INTERMEDIATE = "ir"
+        E_JSON = ".json"
 
-    class RootNames:
-        BASE = "base"
-        MANIFEST = "manifest"
-        ALL = [BASE, MANIFEST]
+        F_BASE = Path("base").with_suffix(E_JSON)
+        F_MANIFEST = Path("manifest").with_suffix(E_JSON)
+        F_SCHEMA = Path("schema").with_suffix(E_JSON)
+        F_ROOTS = [F_BASE, F_MANIFEST]
 
     class Re:
         COMMENTS = re.compile(
@@ -39,8 +39,33 @@ class Constants:
             r'(,)\s*\](?=([^"\\]*(\\.|"([^"\\]*\\.)*[^"\\]*"))*[^"]*$)')
 
 
+JSONPrimitive = Union[str, int, bool, None]
+JSONType = Union[JSONPrimitive, 'JSONList', 'JSONDict']
+JSONTypeIterable = Iterable[JSONType]
+FJSValidator = Callable[['JSONDict'], 'JSONDict']
+PathLibTest = Callable[[Path], bool]
+CompiledDir = Dict[str, Dict[str, 'JSONDict']]
+
+
+# work around mypy#731: no recursive structural types yet
+class JSONList(List[JSONType]):
+    def __init__(self, iterable: JSONTypeIterable) -> None:
+        super().__init__(iterable)
+
+
+class JSONDict(Dict[str, JSONType]):
+    def __init__(
+            self,
+            mapping: Optional[Mapping[str, JSONType]] = None,
+            **kwargs: JSONType ) -> None:
+        if mapping is None:
+            super().__init__(**kwargs)
+        else:
+            super().__init__(mapping, **kwargs)
+
+
 # https://gist.github.com/liftoff/ee7b81659673eca23cd9fc0d8b8e68b7
-def remove_comments(json_like):
+def remove_comments(json_like: str) -> str:
     """
     Removes C-style comments from *json_like* and returns the result.
     Example::
@@ -54,11 +79,15 @@ def remove_comments(json_like):
         >>> remove_comments('{"foo":"bar","baz":"blah",}')
         '{\n    "foo":"bar",\n    "baz":"blah"\n}'
     """
-    replacer = lambda match: "" if match.group(0)[0] == "/" else match.group(0)
+    replacer: (  # type: ignore
+        Callable[[re.Match], str]
+    ) = (lambda match:
+         "" if match.group(0)[0] == "/" else match.group(0))  # type: ignore
+
     return Constants.Re.COMMENTS.sub(replacer, json_like)
 
 
-def remove_trailing_commas(json_like):
+def remove_trailing_commas(json_like: str) -> str:
     """
     Removes trailing commas from *json_like* and returns the result.
     Example::
@@ -78,79 +107,75 @@ def transform_json (s: str) -> str:
     return remove_trailing_commas( remove_comments(s) )
 
 
-def read_json_file (fname: str) -> str:
-    with open(fname, "r") as fp:
-        return transform_json( fp.read() )
+def realize_json (f: Path) -> JSONDict:
+    with open(f, "r") as fp:
+        return cast(JSONDict, json.loads( transform_json( fp.read() ) ))
 
 
-def realize_json (fname: str) -> dict:
-    return json.loads( read_json_file(fname) )
-
-
-def write_json_file (obj: dict, fname: str) -> None:
-    with open(fname, "w") as fp:
-        json.dump(obj, fp, separators=(',', ':'))
+def write_json_file (obj: CompiledDir, f: Path) -> None:
+    with open(f, "w") as fp:
+        json.dump(obj, fp, separators=(',', ':'))  # type: ignore
 
 
 def validate_json_file (
-        fname: str,
-        base_name: str,
-        validator: typing.Callable[[str], None] ) -> dict:
-    print("\t" + base_name)
+        f: Path,
+        validator: FJSValidator ) -> JSONDict:
+    print("\t" + f.stem)
 
-    return (lambda c: validator(c) and json.loads(c))(
-        read_json_file(fname)
-    )
+    return validator( realize_json(f) )
 
 
-def compile_dir(dir_name: str, base_name: str) -> dict:
-    print(dir_name)
-    intermediate_dir = os.path.join(dir_name, Constants.Data.INTERMEDIATE)
-    validator = fastjsonschema.compile( realize_json(
-        os.path.join(dir_name, base_name + Constants.Ext.SCHEMA)
-    ) )
-    return {
+def compile_dir(dir_name: Path) -> CompiledDir:
+    print(dir_name.relative_to(Constants.Paths._up_dir_abs))
+
+    is_file: PathLibTest = lambda x: x.is_file()
+    return (lambda validator: {
         "root": {
-            k:
-                realize_json( os.path.join(dir_name, k + Constants.Ext.JSON) )
-                for k in Constants.RootNames.ALL
+            k.stem:
+                realize_json( dir_name / k )
+                for k in Constants.Paths.F_ROOTS
         },
         "impl": {
-            base_name: validate_json_file( full_path, base_name, validator )
-                for base_name, full_path in map(
-                    lambda x: (
-                        x.split('.')[0],
-                        os.path.join(intermediate_dir, x)
-                    ),
-                    os.listdir(intermediate_dir)
+            p.stem: validate_json_file( p, validator )
+                for p in filter(
+                    is_file,
+                    (dir_name / Constants.Paths.D_INTERMEDIATE).iterdir()
             )
-                if os.path.isfile(full_path)
         },
-    }
+    })( cast(FJSValidator, fastjsonschema.compile(  # type: ignore
+        realize_json( (dir_name / Constants.Paths.F_SCHEMA) )
+    ) ) )
 
 
-def write_dist_data(d: str, compiler: typing.Callable[[str], dict]) -> None:
+def write_dist_data(
+        d: Path,
+        compiler: Callable[[Path], CompiledDir] ) -> None:
     write_json_file(
-        compiler( os.path.join(Constants.Data.GAME, d), d ),
-        os.path.join(Constants.Data.DIST, d + Constants.Ext.JSON)
+        compiler( d ),
+        (Constants.Paths.D_DIST / d.stem).with_suffix(Constants.Paths.E_JSON)
     )
 
 
-def compile_data ():
-    for d in os.listdir(Constants.Data.GAME):
-        if os.path.isdir( os.path.join(Constants.Data.GAME, d) ):
-            write_dist_data(d, compile_dir)
-            # except ValueError as e:
-            # print(e)
-            # sys.exit(2)
+def compile_data () -> List[ Callable[[], None] ]:
+    curry_wdd: Callable[[Path], Callable[[], None]] = \
+        lambda d: lambda: write_dist_data(d, compile_dir)
+
+    dirfilter: PathLibTest = lambda d: d.is_dir()
+
+    return list(map(
+        curry_wdd,
+        filter( dirfilter, Constants.Paths.D_GAME.iterdir() )
+    ))
 
 
-def print_help ():
+def print_help () -> None:
     print(f"\tUsage: {__file__} [-h] [-c|--cleanup-only files...]")
-    print("\nThe default behaviour takes no inputs, reads from data/game\n\tand writes to dist/data")  # noqa
-    print("\nWith -c, JSON with non-standard comments or trailing commas\n\tis turned into valid JSON")  # noqa
-    print("\n  -c files...  --cleanup-only   Cleanup JSON from STDIN or files")  # noqa
-    print("  -h           --help           Show this help")  # noqa
+    print("\nThe default behaviour takes no inputs, reads from data/game \
+           \n\tand writes to dist/data")
+    print("\nWith -c, JSON with non-standard comments or trailing commas \
+           \n\tis turned into valid JSON")
+    print("\n  -c files...  --cleanup-only   Cleanup JSON from STDIN or files")
+    print("  -h           --help           Show this help")
 
 
 def main(opt: str) -> None:
@@ -165,7 +190,9 @@ def main(opt: str) -> None:
         sys.exit(1)
 
     else:
-        compile_data()
+        caller: Callable[[ Callable[[], None] ], None] = \
+            lambda x: x()
+        map(caller, compile_data())
 
 
 if __name__ == '__main__':
