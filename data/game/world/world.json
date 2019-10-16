@@ -1,7 +1,0 @@
-{
-  "root": "outside",
-  "edges": [
-    { "group": { "intro": [] }, "position": { "random": true } },
-    { "id": "catacomb", "position": { "random": true } }
-  ]
-}
