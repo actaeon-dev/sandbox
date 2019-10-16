@@ -146,11 +146,11 @@ def compile_data ():
 
 
 def print_help ():
-    print(f"Usage: {__file__} [-h] [-c|--cleanup-only file...]")
-    print("\nThe default behaviour takes no inputs, reads from data/game and writes to dist/data")  # noqa
-    print("\nWith -c, JSON with non-standard comments or trailing commas is turned into valid JSON")  # noqa
-    print("\n-c  --cleanup-only   Simply remove JSON comments from STDIN or file parameters")  # noqa
-    print("-h  --help           Show this help")  # noqa
+    print(f"\tUsage: {__file__} [-h] [-c|--cleanup-only files...]")
+    print("\nThe default behaviour takes no inputs, reads from data/game\n\tand writes to dist/data")  # noqa
+    print("\nWith -c, JSON with non-standard comments or trailing commas\n\tis turned into valid JSON")  # noqa
+    print("\n  -c files...  --cleanup-only   Cleanup JSON from STDIN or files")  # noqa
+    print("  -h           --help           Show this help")  # noqa
 
 
 def main(opt: str) -> None:
